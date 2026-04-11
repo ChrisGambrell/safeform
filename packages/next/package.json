@@ -1,0 +1,36 @@
+{
+  "name": "@safeform/next",
+  "version": "0.0.1",
+  "description": "Next.js App Router adapter for safeform",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "tsc --project tsconfig.build.json --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "safeform": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": ">=14.0.0",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "zod": "^3.24.2",
+    "vitest": "^3.1.2",
+    "typescript": "^5.8.3"
+  }
+}

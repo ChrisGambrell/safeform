@@ -1,0 +1,37 @@
+{
+  "name": "safeform",
+  "version": "0.0.1",
+  "description": "End-to-end type-safe forms for React",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "tsc --project tsconfig.build.json --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "zod": "^3.0.0",
+    "react": "^18.0.0",
+    "react-hook-form": "^7.0.0"
+  },
+  "devDependencies": {
+    "zod": "^3.24.2",
+    "react": "^18.3.1",
+    "react-hook-form": "^7.56.1",
+    "@types/react": "^18.3.22",
+    "vitest": "^3.1.2",
+    "typescript": "^5.8.3"
+  }
+}
