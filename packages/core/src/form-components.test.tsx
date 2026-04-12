@@ -579,10 +579,10 @@ describe('FormArray — value integrity after remove (C-6/C-8)', () => {
     await waitFor(() => expect(screen.getByTestId('tag-1')).toBeDefined())
 
     // Fill both items
-    fireEvent.change(screen.getByTestId('tag-0') as HTMLInputElement, {
+    fireEvent.change(screen.getByTestId('tag-0'), {
       target: { value: 'first' },
     })
-    fireEvent.change(screen.getByTestId('tag-1') as HTMLInputElement, {
+    fireEvent.change(screen.getByTestId('tag-1'), {
       target: { value: 'second' },
     })
 

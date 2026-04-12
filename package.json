@@ -9,6 +9,7 @@
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\" --ignore-path .gitignore",
+    "test-ci": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm --filter safeform-example-next exec playwright test",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"

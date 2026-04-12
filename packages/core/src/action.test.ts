@@ -20,7 +20,7 @@ describe('createAction()', () => {
   })
 
   it('builder.create() produces a correctly shaped action object', () => {
-    const action = createAction().create({ schema }, async (data, _ctx) => ({
+    const action = createAction().create({ schema }, async (_data, _ctx) => ({
       success: true as const,
       data: { created: true },
     }))
@@ -33,7 +33,7 @@ describe('createAction()', () => {
 
   it('builder.create() with payload schema stores payload schema', () => {
     const payload = z.object({ id: z.string() })
-    const action = createAction().create({ schema, payload }, async (data, _payload, _ctx) => ({
+    const action = createAction().create({ schema, payload }, async (_data, _payload, _ctx) => ({
       success: true as const,
     }))
 
@@ -42,9 +42,8 @@ describe('createAction()', () => {
   })
 
   it('handler receives correctly typed data from schema', async () => {
-    const handler = vi.fn(async (data: z.output<typeof schema>, _ctx: object) => ({
+    const handler = vi.fn(async (_data: z.output<typeof schema>, _ctx: object) => ({
       success: true as const,
-      data,
     }))
 
     const action = createAction().create({ schema }, handler)
@@ -57,7 +56,7 @@ describe('createAction()', () => {
   it('handler receives data and payload when payload schema provided', async () => {
     const payload = z.object({ facilityId: z.string() })
     const handler = vi.fn(
-      async (data: z.output<typeof schema>, p: z.output<typeof payload>, _ctx: object) => ({
+      async (_data: z.output<typeof schema>, _p: z.output<typeof payload>, _ctx: object) => ({
         success: true as const,
       }),
     )

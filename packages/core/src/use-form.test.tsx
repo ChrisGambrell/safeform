@@ -33,9 +33,9 @@ type DummyAction = {
   _payload: undefined
   _ctx: object
   _data: { id: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   _middlewares: any[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   _handler: (...args: any[]) => any
 }
 
@@ -127,7 +127,7 @@ describe('fetch on validation pass — H-3', () => {
       }),
     )
 
-    const callBody = JSON.parse((fetchSpy.mock.calls[0]![1]! as RequestInit).body as string) as unknown
+    const callBody = JSON.parse((fetchSpy.mock.calls[0]![1]!).body as string) as unknown
     expect(callBody).toEqual({ data: { name: 'Alice', age: 30 } })
   })
 
@@ -139,9 +139,9 @@ describe('fetch on validation pass — H-3', () => {
       _payload: z.ZodObject<{ facilityId: z.ZodString }>
       _ctx: object
       _data: null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       _middlewares: any[]
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       _handler: (...args: any[]) => any
     }
 
@@ -165,7 +165,7 @@ describe('fetch on validation pass — H-3', () => {
       } as unknown as React.FormEvent)
     })
 
-    const callBody = JSON.parse((fetchSpy.mock.calls[0]![1]! as RequestInit).body as string) as unknown
+    const callBody = JSON.parse((fetchSpy.mock.calls[0]![1]!).body as string) as unknown
     expect(callBody).toEqual({ data: { name: 'Bob', age: 25 }, payload: { facilityId: 'fac-1' } })
   })
 })
@@ -350,9 +350,9 @@ describe('multi-step detection — H-8', () => {
     _payload: undefined
     _ctx: object
     _data: { id: string }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     _middlewares: any[]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     _handler: (...args: any[]) => any
   }
 
@@ -455,7 +455,7 @@ describe('multi-step detection — H-8', () => {
       result.current.handleSubmit({ preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.FormEvent)
     })
 
-    const callBody = JSON.parse((fetchSpy.mock.calls[0]![1]! as RequestInit).body as string) as { data: unknown[] }
+    const callBody = JSON.parse((fetchSpy.mock.calls[0]![1]!).body as string) as { data: unknown[] }
     expect(Array.isArray(callBody.data)).toBe(true)
     expect(callBody.data[0]).toEqual({ firstName: 'Alice', lastName: 'Smith' })
     expect(callBody.data[1]).toEqual({ email: 'alice@example.com' })
@@ -472,9 +472,9 @@ describe('multi-step detection — H-8', () => {
       _payload: undefined
       _ctx: object
       _data: null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       _middlewares: any[]
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       _handler: (...args: any[]) => any
     }
 
@@ -501,9 +501,9 @@ describe('named multi-step (createSteps) — H-8', () => {
     _payload: undefined
     _ctx: object
     _data: { ok: true }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     _middlewares: any[]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     _handler: (...args: any[]) => any
   }
 
@@ -560,7 +560,7 @@ describe('named multi-step (createSteps) — H-8', () => {
     })
 
     const body = JSON.parse(
-      (fetchSpy.mock.calls[0]![1]! as RequestInit).body as string,
+      (fetchSpy.mock.calls[0]![1]!).body as string,
     ) as { data: unknown[] }
 
     expect(Array.isArray(body.data)).toBe(true)

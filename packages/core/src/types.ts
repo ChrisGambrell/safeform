@@ -12,9 +12,7 @@ export type AnySchema = z.ZodTypeAny | NamedSteps<Record<string, z.ZodObject<any
 // Action result types
 // ---------------------------------------------------------------------------
 
-export type FieldErrors<TSchema extends z.ZodTypeAny> = Partial<
-  Record<string, string[]>
-> & { _root?: string[] }
+export type FieldErrors = Partial<Record<string, string[]>> & { _root?: string[] }
 
 export type ActionResult<TData = void> =
   | { success: true; data?: TData }

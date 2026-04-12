@@ -78,7 +78,7 @@ function extractDefaultValues(schema: z.ZodTypeAny): Record<string, unknown> {
   const shape = (unwrapped as z.ZodObject<z.ZodRawShape>).shape
   const defaults: Record<string, unknown> = {}
   for (const [key, fieldSchema] of Object.entries(shape)) {
-    let inner = fieldSchema as z.ZodTypeAny
+    let inner = fieldSchema
     while (
       inner instanceof z.ZodOptional ||
       inner instanceof z.ZodNullable ||
@@ -108,7 +108,7 @@ function getStepSchema(
   step: number,
 ): z.ZodObject<z.ZodRawShape> {
   if (isZodTuple(schema)) {
-    const items = (schema as z.ZodTuple<any>).items as z.ZodObject<z.ZodRawShape>[]
+    const items = (schema).items as z.ZodObject<z.ZodRawShape>[]
     return items[step] ?? items[0]!
   }
   if (isNamedSteps(schema)) {
@@ -120,7 +120,7 @@ function getStepSchema(
 }
 
 function getTotalSteps(schema: AnySchema): number {
-  if (isZodTuple(schema)) return (schema as z.ZodTuple<any>).items.length
+  if (isZodTuple(schema)) return (schema.items as z.ZodTypeAny[]).length
   if (isNamedSteps(schema))
     return Object.keys((schema as NamedSteps<Record<string, z.ZodObject<z.ZodRawShape>>>)._steps).length
   return 1
@@ -218,7 +218,7 @@ export function useForm<
         if (result.fieldErrors) {
           // Map server field errors back into RHF so they show via FormField
           Object.entries(result.fieldErrors).forEach(([key, messages]) => {
-            rhf.setError(key as string, { type: 'server', message: messages[0] ?? '' })
+            rhf.setError(key, { type: 'server', message: messages[0] ?? '' })
           })
           setState((s) => ({ ...s, fieldErrors: result.fieldErrors! }))
         } else {
@@ -298,7 +298,7 @@ export function useForm<
   // ---------------------------------------------------------------------------
 
   const ctx: SafeFormContextValue = {
-    rhf: rhf as any,
+    rhf: rhf as SafeFormContextValue['rhf'],
     fieldErrors: state.fieldErrors,
     currentStep: step,
   }

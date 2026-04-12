@@ -25,9 +25,10 @@ export async function runMiddlewareChain(
     let nextCalled = false
 
     await middleware(
-      async (ctx) => {
+      (ctx) => {
         nextCalled = true
         nextCtx = ctx
+        return Promise.resolve()
       },
       currentCtx,
     )

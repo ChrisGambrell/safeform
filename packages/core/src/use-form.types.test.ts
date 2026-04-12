@@ -19,18 +19,18 @@ const personSchema = z.object({ name: z.string(), age: z.number() })
 const emailSchema = z.object({ email: z.string() })
 const payloadSchema = z.object({ id: z.string() })
 
-const noPayloadAction = createAction().create(
+const _noPayloadAction = createAction().create(
   { schema: personSchema },
   async (_data) => ({ success: true as const }),
 )
 
-const withPayloadAction = createAction().create(
+const _withPayloadAction = createAction().create(
   { schema: personSchema, payload: payloadSchema },
   async (_data, _payload) => ({ success: true as const }),
 )
 
-type NoPayloadAction = typeof noPayloadAction
-type WithPayloadAction = typeof withPayloadAction
+type NoPayloadAction = typeof _noPayloadAction
+type WithPayloadAction = typeof _withPayloadAction
 
 // ---- H-14: schema must match TAction['_schema'] ----------------------------
 
