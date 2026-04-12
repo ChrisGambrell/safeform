@@ -469,3 +469,140 @@ describe('multi-step detection — H-8', () => {
     expect(result.current.totalSteps).toBe(2)
   })
 })
+
+// ---------------------------------------------------------------------------
+// H-8 (named steps): createSteps multi-step navigation
+// ---------------------------------------------------------------------------
+
+describe('named multi-step (createSteps) — H-8', () => {
+  const namedSchema = createSteps({
+    personal: z.object({ name: z.string().min(1) }),
+    contact: z.object({ email: z.string().email() }),
+  })
+
+  type NamedAction = {
+    _schema: typeof namedSchema
+    _payload: undefined
+    _ctx: object
+    _data: { ok: true }
+  }
+
+  it('next() advances step when valid', async () => {
+    const { result } = renderHook(() =>
+      useForm<NamedAction>({ endpoint: '/api/test', schema: namedSchema }),
+    )
+
+    act(() => { result.current._ctx.rhf.setValue('name', 'Alice') })
+
+    await act(async () => { await result.current.next() })
+
+    expect(result.current.step).toBe(1)
+  })
+
+  it('next() does not advance when invalid', async () => {
+    const { result } = renderHook(() =>
+      useForm<NamedAction>({ endpoint: '/api/test', schema: namedSchema }),
+    )
+
+    // Leave name empty
+    await act(async () => { await result.current.next() })
+
+    expect(result.current.step).toBe(0)
+  })
+
+  it('prev() goes back to step 0 from step 1', async () => {
+    const { result } = renderHook(() =>
+      useForm<NamedAction>({ endpoint: '/api/test', schema: namedSchema }),
+    )
+
+    act(() => { result.current._ctx.rhf.setValue('name', 'Alice') })
+    await act(async () => { await result.current.next() })
+    expect(result.current.step).toBe(1)
+
+    act(() => { result.current.prev() })
+    expect(result.current.step).toBe(0)
+  })
+
+  it('final submit sends all step data as array', async () => {
+    const fetchSpy = mockFetch({ success: true, data: { ok: true } })
+
+    const { result } = renderHook(() =>
+      useForm<NamedAction>({ endpoint: '/api/test', schema: namedSchema }),
+    )
+
+    act(() => { result.current._ctx.rhf.setValue('name', 'Alice') })
+    await act(async () => { await result.current.next() })
+
+    act(() => { result.current._ctx.rhf.setValue('email', 'alice@example.com') })
+
+    await act(async () => {
+      result.current.handleSubmit({ preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.FormEvent)
+    })
+
+    const body = JSON.parse(
+      (fetchSpy.mock.calls[0]![1]! as RequestInit).body as string,
+    ) as { data: unknown[] }
+
+    expect(Array.isArray(body.data)).toBe(true)
+    expect(body.data[0]).toEqual({ name: 'Alice' })
+    expect(body.data[1]).toEqual({ email: 'alice@example.com' })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// H-4/H-5: State fields are set correctly
+// ---------------------------------------------------------------------------
+
+describe('state correctness', () => {
+  it('state.error is null initially', () => {
+    const { result } = renderHook(() =>
+      useForm<DummyAction>({ endpoint: '/api/test', schema }),
+    )
+    expect(result.current.state.error).toBeNull()
+  })
+
+  it('state.error is set to server error message on failure', async () => {
+    mockFetch({ success: false, error: 'Server is on fire' }, 500)
+
+    const { result } = renderHook(() =>
+      useForm<DummyAction>({ endpoint: '/api/test', schema }),
+    )
+
+    act(() => {
+      result.current._ctx.rhf.setValue('name', 'Alice')
+      result.current._ctx.rhf.setValue('age', 30)
+    })
+
+    await act(async () => {
+      result.current.handleSubmit({ preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.FormEvent)
+    })
+
+    expect(result.current.state.error).toBe('Server is on fire')
+  })
+
+  it('state.error is cleared on next successful submit', async () => {
+    mockFetch({ success: false, error: 'Oops' }, 500)
+
+    const { result } = renderHook(() =>
+      useForm<DummyAction>({ endpoint: '/api/test', schema }),
+    )
+
+    act(() => {
+      result.current._ctx.rhf.setValue('name', 'Alice')
+      result.current._ctx.rhf.setValue('age', 30)
+    })
+
+    await act(async () => {
+      result.current.handleSubmit({ preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.FormEvent)
+    })
+    expect(result.current.state.error).toBe('Oops')
+
+    mockFetch({ success: true, data: { id: '1' } })
+
+    await act(async () => {
+      result.current.handleSubmit({ preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.FormEvent)
+    })
+
+    expect(result.current.state.error).toBeNull()
+  })
+})
