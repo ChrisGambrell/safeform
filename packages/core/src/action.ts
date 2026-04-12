@@ -1,5 +1,6 @@
 import type { z } from 'zod'
-import type { Action, ActionHandler, ActionResult, MiddlewareFn } from './types.js'
+import type { Action, ActionResult, MiddlewareFn } from './types.js'
+import type { NamedSteps, NamedStepsOutput, MergedTupleOutput } from './schema.js'
 
 // ---------------------------------------------------------------------------
 // ActionBuilder — returned by createAction() and .use()
@@ -37,6 +38,11 @@ export class ActionBuilder<TCtx> {
   /**
    * Create a typed action from this builder.
    *
+   * Supports three schema types:
+   *  - `z.object({...})` — single-step
+   *  - `z.tuple([...])` — unnamed multi-step (server receives flat merged data)
+   *  - `createSteps({...})` — named multi-step (server receives namespaced data)
+   *
    * @example
    * export const upsertEmployee = authedAction.create({
    *   schema: upsertEmployeeSchema,
@@ -45,6 +51,26 @@ export class ActionBuilder<TCtx> {
    *   return { success: true, data: { employeeId: '123' } }
    * })
    */
+
+  // Overload 1: named steps, no payload
+  create<T extends Record<string, z.ZodObject<any>>, TData>(
+    config: { schema: NamedSteps<T>; payload?: undefined },
+    handler: (
+      data: NamedStepsOutput<NamedSteps<T>>,
+      ctx: TCtx,
+    ) => Promise<ActionResult<TData>> | ActionResult<TData>,
+  ): Action<NamedSteps<T>, undefined, TCtx, TData>
+
+  // Overload 2: z.tuple (unnamed multi-step), no payload
+  create<TItems extends [z.ZodObject<any>, ...z.ZodObject<any>[]], TData>(
+    config: { schema: z.ZodTuple<TItems>; payload?: undefined },
+    handler: (
+      data: MergedTupleOutput<TItems>,
+      ctx: TCtx,
+    ) => Promise<ActionResult<TData>> | ActionResult<TData>,
+  ): Action<z.ZodTuple<TItems>, undefined, TCtx, TData>
+
+  // Overload 3: single-step z.object with payload
   create<
     TSchema extends z.ZodTypeAny,
     TPayload extends z.ZodTypeAny,
@@ -58,6 +84,7 @@ export class ActionBuilder<TCtx> {
     ) => Promise<ActionResult<TData>> | ActionResult<TData>,
   ): Action<TSchema, TPayload, TCtx, TData>
 
+  // Overload 4: single-step z.object, no payload
   create<TSchema extends z.ZodTypeAny, TData>(
     config: { schema: TSchema; payload?: undefined },
     handler: (
@@ -66,19 +93,18 @@ export class ActionBuilder<TCtx> {
     ) => Promise<ActionResult<TData>> | ActionResult<TData>,
   ): Action<TSchema, undefined, TCtx, TData>
 
-  create<
-    TSchema extends z.ZodTypeAny,
-    TPayload extends z.ZodTypeAny | undefined,
-    TData,
-  >(
-    config: { schema: TSchema; payload?: TPayload },
-    handler: ActionHandler<TSchema, TPayload, TCtx, TData>,
-  ): Action<TSchema, TPayload, TCtx, TData> {
+  // Implementation (not public API)
+  create(
+    config: { schema: unknown; payload?: unknown },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handler: (...args: any[]) => any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Action<any, any, TCtx, any> {
     return {
       _schema: config.schema,
-      _payload: config.payload as TPayload,
+      _payload: config.payload,
       _ctx: undefined as TCtx,
-      _data: undefined as TData,
+      _data: undefined,
       _middlewares: this.middlewares,
       _handler: handler,
     }

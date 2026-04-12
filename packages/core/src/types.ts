@@ -1,4 +1,12 @@
 import type { z } from 'zod'
+import type { NamedSteps } from './schema.js'
+
+// ---------------------------------------------------------------------------
+// Any schema that safeform accepts
+// ---------------------------------------------------------------------------
+
+/** All schema types accepted by safeform — plain Zod types or named multi-step */
+export type AnySchema = z.ZodTypeAny | NamedSteps<Record<string, z.ZodObject<any>>>
 
 // ---------------------------------------------------------------------------
 // Action result types
@@ -27,18 +35,17 @@ export type MiddlewareFn<TCtxIn, TCtxOut> = (
 // ---------------------------------------------------------------------------
 
 export type ActionHandler<
-  TSchema extends z.ZodTypeAny,
-  TPayload extends z.ZodTypeAny | undefined,
-  TCtx,
   TData,
+  TCtx,
+  TPayload extends z.ZodTypeAny | undefined = undefined,
 > = TPayload extends z.ZodTypeAny
   ? (
-      data: z.output<TSchema>,
+      data: unknown,
       payload: z.output<TPayload>,
       ctx: TCtx,
     ) => Promise<ActionResult<TData>> | ActionResult<TData>
   : (
-      data: z.output<TSchema>,
+      data: unknown,
       ctx: TCtx,
     ) => Promise<ActionResult<TData>> | ActionResult<TData>
 
@@ -47,7 +54,7 @@ export type ActionHandler<
 // ---------------------------------------------------------------------------
 
 export interface Action<
-  TSchema extends z.ZodTypeAny,
+  TSchema extends AnySchema,
   TPayload extends z.ZodTypeAny | undefined,
   TCtx,
   TData,
@@ -58,5 +65,6 @@ export interface Action<
   _data: TData // phantom type — never holds a value at runtime
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _middlewares: MiddlewareFn<any, any>[]
-  _handler: ActionHandler<TSchema, TPayload, TCtx, TData>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _handler: ActionHandler<TData, TCtx, any>
 }

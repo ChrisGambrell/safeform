@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { isZodTuple, isNamedSteps } from './schema.js'
 import type { NamedSteps } from './schema.js'
-import type { Action } from './types.js'
+import type { Action, AnySchema } from './types.js'
 import type { SafeFormContextValue } from './form-context.js'
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ export interface SafeFormState<TData> {
 
 export interface UseFormOptions<TPayload, TData> {
   endpoint: string
-  schema: z.ZodTypeAny
+  schema: AnySchema
   payload?: TPayload
   onSuccess?: (data: TData) => void
   onError?: (error: string) => void
@@ -95,7 +95,7 @@ type ServerResponse = {
 }
 
 function getStepSchema(
-  schema: z.ZodTypeAny,
+  schema: AnySchema,
   step: number,
 ): z.ZodObject<z.ZodRawShape> {
   if (isZodTuple(schema)) {
@@ -110,7 +110,7 @@ function getStepSchema(
   return schema as z.ZodObject<z.ZodRawShape>
 }
 
-function getTotalSteps(schema: z.ZodTypeAny): number {
+function getTotalSteps(schema: AnySchema): number {
   if (isZodTuple(schema)) return (schema as z.ZodTuple<any>).items.length
   if (isNamedSteps(schema))
     return Object.keys((schema as NamedSteps<Record<string, z.ZodObject<z.ZodRawShape>>>)._steps).length

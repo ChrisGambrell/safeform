@@ -23,4 +23,4 @@ export type {
   MergedTupleOutput,
   NamedStepsOutput,
 } from './schema.js'
-export type { Action, ActionResult, MiddlewareFn } from './types.js'
+export type { Action, ActionResult, MiddlewareFn, AnySchema } from './types.js'

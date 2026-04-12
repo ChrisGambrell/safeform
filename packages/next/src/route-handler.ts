@@ -6,7 +6,7 @@ import {
   mergeStepData,
   namespaceStepData,
 } from 'safeform'
-import type { Action } from 'safeform'
+import type { Action, AnySchema } from 'safeform'
 
 // ---------------------------------------------------------------------------
 // Error messages used internally and in tests
@@ -119,7 +119,7 @@ function parseSchema(schema: unknown, rawData: unknown): ParseResult {
  * export const POST = createRouteHandler(upsertEmployeeAction)
  */
 export function createRouteHandler<
-  TSchema extends z.ZodTypeAny,
+  TSchema extends AnySchema,
   TPayload extends z.ZodTypeAny | undefined,
   TCtx,
   TData,
