@@ -45,10 +45,10 @@ describe('H-14: schema type enforcement', () => {
     void _opts
   })
 
-  it('rejects a mismatched schema (negative)', () => {
-    // @ts-expect-error — emailSchema is not assignable to personSchema's type
+  it('rejects a mismatched schema via UseFormOptions (negative)', () => {
     const _opts: UseFormOptions<NoPayloadAction['_schema'], never, void> = {
       endpoint: '/api/test',
+      // @ts-expect-error — emailSchema shape does not match personSchema
       schema: emailSchema,
     }
     void _opts

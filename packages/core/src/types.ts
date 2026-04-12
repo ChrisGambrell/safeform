@@ -65,6 +65,7 @@ export interface Action<
   _data: TData // phantom type — never holds a value at runtime
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _middlewares: MiddlewareFn<any, any>[]
+  // Typed loosely so callers can invoke it without knowing whether payload is present
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _handler: ActionHandler<TData, TCtx, any>
+  _handler: (...args: any[]) => Promise<ActionResult<TData>> | ActionResult<TData>
 }

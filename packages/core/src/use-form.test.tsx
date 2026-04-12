@@ -33,6 +33,10 @@ type DummyAction = {
   _payload: undefined
   _ctx: object
   _data: { id: string }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _middlewares: any[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _handler: (...args: any[]) => any
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +139,10 @@ describe('fetch on validation pass — H-3', () => {
       _payload: z.ZodObject<{ facilityId: z.ZodString }>
       _ctx: object
       _data: null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _middlewares: any[]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _handler: (...args: any[]) => any
     }
 
     const { result } = renderHook(() =>
@@ -342,6 +350,10 @@ describe('multi-step detection — H-8', () => {
     _payload: undefined
     _ctx: object
     _data: { id: string }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _middlewares: any[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _handler: (...args: any[]) => any
   }
 
   it('detects z.tuple as multi-step', () => {
@@ -460,6 +472,10 @@ describe('multi-step detection — H-8', () => {
       _payload: undefined
       _ctx: object
       _data: null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _middlewares: any[]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _handler: (...args: any[]) => any
     }
 
     const { result } = renderHook(() =>
@@ -485,6 +501,10 @@ describe('named multi-step (createSteps) — H-8', () => {
     _payload: undefined
     _ctx: object
     _data: { ok: true }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _middlewares: any[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _handler: (...args: any[]) => any
   }
 
   it('next() advances step when valid', async () => {

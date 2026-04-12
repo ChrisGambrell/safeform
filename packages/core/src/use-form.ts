@@ -31,9 +31,9 @@ export type UseFormOptions<TSchema extends AnySchema, TPayload, TData> = {
   /** Must match the schema passed to `action.create()`. */
   schema: TSchema
   /** Called with the typed server handler return value on success. */
-  onSuccess?: (data: TData) => void
+  onSuccess?: ((data: TData) => void) | undefined
   /** Called with the global error string on failure. */
-  onError?: (error: string) => void
+  onError?: ((error: string) => void) | undefined
 } & ([TPayload] extends [never] ? { payload?: never } : { payload: TPayload })
 
 export interface UseFormReturn<TData> {
@@ -145,7 +145,11 @@ function getTotalSteps(schema: AnySchema): number {
  *   onError: (error) => toast.error(error),
  * })
  */
-export function useForm<TAction extends Action<any, any, any, any>>(
+export function useForm<
+  // Default to no-payload so useForm({...}) without a type param compiles without requiring payload
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TAction extends Action<any, any, any, any> = Action<z.ZodTypeAny, undefined, object, unknown>
+>(
   options: UseFormOptions<
     TAction['_schema'],
     TAction['_payload'] extends z.ZodTypeAny ? z.output<TAction['_payload']> : never,
