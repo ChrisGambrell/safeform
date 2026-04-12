@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 import type { NamedSteps } from './schema.js'
+import type { ZodPaths } from './paths.js'
 
 // ---------------------------------------------------------------------------
 // Field name utility
@@ -22,7 +23,7 @@ import type { NamedSteps } from './schema.js'
  * }) { ... }
  */
 export type FieldName<TAction extends Action<any, any, any, any>> =  // eslint-disable-line @typescript-eslint/no-explicit-any
-  keyof z.output<TAction['_schema']> & string
+  TAction['_schema'] extends z.ZodTypeAny ? ZodPaths<TAction['_schema']> : string
 
 // ---------------------------------------------------------------------------
 // Any schema that safeform accepts
