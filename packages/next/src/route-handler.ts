@@ -183,7 +183,7 @@ export function createRouteHandler<
         )(parsed.data, ctx)
       }
     } catch (err) {
-      console.error('[safeform] Unexpected handler error:', err)
+      console.error('[@safeform/next] Unexpected handler error:', err)
       return Response.json({ success: false, error: ERRORS.INTERNAL }, { status: 500 })
     }
 

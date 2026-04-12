@@ -17,7 +17,7 @@ export function useSafeFormContext(): SafeFormContextValue {
   const ctx = useContext(SafeFormContext)
   if (!ctx) {
     throw new Error(
-      '[safeform] FormField/FormArray must be used inside a useForm() form. ' +
+      '[@safeform/core] FormField/FormArray must be used inside a useForm() form. ' +
         'Make sure your component is rendered within the form returned by useForm().',
     )
   }
