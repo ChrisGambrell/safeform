@@ -27,7 +27,7 @@ export default function EmployeePage() {
       )}
 
       <SafeFormContext.Provider value={form._ctx}>
-        <form onSubmit={form.handleSubmit} data-testid="employee-form">
+        <form {...form.formProps} data-testid="employee-form">
           <div style={{ marginBottom: '1rem' }}>
             <FormField name="name">
               {({ value, onChange, errors }) => (

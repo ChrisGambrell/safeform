@@ -2,6 +2,29 @@ import type { z } from 'zod'
 import type { NamedSteps } from './schema.js'
 
 // ---------------------------------------------------------------------------
+// Field name utility
+// ---------------------------------------------------------------------------
+
+/**
+ * Valid field name strings for a given action's schema.
+ *
+ * Use with `TypedCtx` to build reusable field components with a typed `name` prop.
+ *
+ * @example
+ * function TextField<TAction extends Action<any, any, any, any>>({
+ *   ctx,
+ *   name,
+ *   label,
+ * }: {
+ *   ctx: TypedCtx<TAction>
+ *   name: FieldName<TAction>
+ *   label: string
+ * }) { ... }
+ */
+export type FieldName<TAction extends Action<any, any, any, any>> =  // eslint-disable-line @typescript-eslint/no-explicit-any
+  keyof z.output<TAction['_schema']> & string
+
+// ---------------------------------------------------------------------------
 // Any schema that safeform accepts
 // ---------------------------------------------------------------------------
 

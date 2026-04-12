@@ -22,7 +22,7 @@ export default function IntakePage() {
       )}
 
       <SafeFormContext.Provider value={form._ctx}>
-        <form onSubmit={form.handleSubmit} data-testid="intake-form" noValidate>
+        <form {...form.formProps} data-testid="intake-form">
           {form.step === 0 && (
             <div>
               <h2>Personal</h2>

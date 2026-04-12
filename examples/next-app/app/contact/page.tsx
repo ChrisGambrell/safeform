@@ -28,7 +28,7 @@ export default function ContactPage() {
       )}
 
       <SafeFormContext.Provider value={form._ctx}>
-        <form onSubmit={form.handleSubmit} data-testid="contact-form" noValidate>
+        <form {...form.formProps} data-testid="contact-form">
           <div style={{ marginBottom: '1rem' }}>
             <FormField name="email">
               {({ value, onChange, errors }) => (

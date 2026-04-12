@@ -21,7 +21,7 @@ export default function TagsPage() {
       )}
 
       <SafeFormContext.Provider value={form._ctx}>
-        <form onSubmit={form.handleSubmit} data-testid="tags-form" noValidate>
+        <form {...form.formProps} data-testid="tags-form">
           <div style={{ marginBottom: '1rem' }}>
             <FormField name="title">
               {({ value, onChange, errors }) => (

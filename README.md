@@ -119,7 +119,7 @@ import { toast } from 'sonner'
 export function EmployeeForm({ employee }: { employee?: Employee }) {
   const router = useRouter()
 
-  const { handleSubmit, state, _ctx } = useForm<UpsertEmployeeAction>({
+  const { formProps, state, _ctx } = useForm<UpsertEmployeeAction>({
     endpoint: '/api/employees',
     schema: upsertEmployeeSchema,
     payload: { employeeId: employee?.id },
@@ -132,7 +132,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
   return (
     <SafeFormContext.Provider value={_ctx}>
-      <form onSubmit={handleSubmit} noValidate>
+      <form {...formProps}>
         <FormField name="firstName">
           {({ value, onChange, onBlur, errors }) => (
             <div>
@@ -245,7 +245,7 @@ Both modes enforce that no field name is shared across steps — TypeScript will
 import { useForm, FormField, SafeFormContext } from '@safeform/core'
 
 const {
-  handleSubmit,
+  formProps,
   state,
   _ctx,
   step,
@@ -263,7 +263,7 @@ const {
 
 return (
   <SafeFormContext.Provider value={_ctx}>
-    <form onSubmit={handleSubmit} noValidate>
+    <form {...formProps}>
       <p>Step {step + 1} of {totalSteps}</p>
 
       {step === 0 && (
@@ -334,23 +334,30 @@ const schema = z.object({
 
 ---
 
-## Bringing Your Own UI (shadcn example)
+## Bringing Your Own UI
 
-Write adapters once, reuse everywhere:
+Build reusable field components once. `SafeFormContext.Provider` goes outside the `<form>` so every field inside can read from it. Pass `_ctx` to each field component — TypeScript infers valid `name` values from the schema automatically.
 
 ```tsx
 // components/fields/text-field.tsx
 import { FormField } from '@safeform/core'
+import type { Action, TypedCtx, FieldName } from '@safeform/core'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-interface TextFieldProps {
-  name: string
+interface TextFieldProps<TAction extends Action<any, any, any, any>> {
+  ctx: TypedCtx<TAction>   // binds this field to a specific form's schema
+  name: FieldName<TAction> // inferred — only valid field names are accepted
   label: string
   placeholder?: string
 }
 
-export function TextField({ name, label, placeholder }: TextFieldProps) {
+export function TextField<TAction extends Action<any, any, any, any>>({
+  ctx: _ctx, // received for type inference; context is provided by the outer Provider
+  name,
+  label,
+  placeholder,
+}: TextFieldProps<TAction>) {
   return (
     <FormField name={name}>
       {({ value, onChange, onBlur, errors }) => (
@@ -374,11 +381,24 @@ export function TextField({ name, label, placeholder }: TextFieldProps) {
 }
 ```
 
-Then in your forms:
+In your form, spread `formProps` onto `<form>` and place the `Provider` outside it:
 
 ```tsx
-<TextField name="firstName" label="First Name" />
-<TextField name="lastName" label="Last Name" />
+export function EmployeeForm() {
+  const { _ctx, formProps, state } = useForm<UpsertEmployeeAction>({ ... })
+
+  return (
+    <SafeFormContext.Provider value={_ctx}>
+      <form {...formProps}>   {/* spreads onSubmit + noValidate */}
+        <TextField ctx={_ctx} name="firstName" label="First Name" />
+        <TextField ctx={_ctx} name="lastName" label="Last Name" />
+        {/* TypeScript error: name="ssnn" — not a valid field */}
+
+        <button type="submit" disabled={state.isPending}>Save</button>
+      </form>
+    </SafeFormContext.Provider>
+  )
+}
 ```
 
 ---

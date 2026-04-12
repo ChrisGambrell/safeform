@@ -78,7 +78,7 @@ import { upsertEmployeeSchema } from '@/app/api/employees/schema'
 import type { UpsertEmployeeAction } from '@/app/api/employees/route'
 
 export function EmployeeForm({ employee }: { employee?: Employee }) {
-  const { handleSubmit, state, _ctx } = useForm<UpsertEmployeeAction>({
+  const { formProps, state, _ctx } = useForm<UpsertEmployeeAction>({
     endpoint: '/api/employees',
     schema: upsertEmployeeSchema,
     payload: { employeeId: employee?.id },
@@ -88,7 +88,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
   return (
     <SafeFormContext.Provider value={_ctx}>
-      <form onSubmit={handleSubmit} noValidate>
+      <form {...formProps}>
         <FormField name="firstName">
           {({ value, onChange, onBlur, errors }) => (
             <div>
@@ -153,7 +153,7 @@ export const intakeAction = authedAction.create({
 ```
 
 ```tsx
-const { handleSubmit, state, _ctx, step, totalSteps, next, prev, isFirstStep, isLastStep } =
+const { formProps, state, _ctx, step, totalSteps, next, prev, isFirstStep, isLastStep } =
   useForm<OnboardingAction>({
     endpoint: '/api/onboarding',
     schema: onboardingSchema,
@@ -161,7 +161,7 @@ const { handleSubmit, state, _ctx, step, totalSteps, next, prev, isFirstStep, is
 
 return (
   <SafeFormContext.Provider value={_ctx}>
-    <form onSubmit={handleSubmit} noValidate>
+    <form {...formProps}>
       {step === 0 && <FormField name="firstName">{...}</FormField>}
       {step === 1 && <FormField name="address">{...}</FormField>}
 
@@ -210,6 +210,65 @@ const schema = z.object({
     </>
   )}
 </FormArray>
+```
+
+---
+
+## Bringing Your Own UI
+
+Build reusable field components once. `SafeFormContext.Provider` goes outside the `<form>` so every field inside can read from it. Pass `_ctx` to each field component — TypeScript infers valid `name` values from the schema automatically.
+
+```tsx
+// components/fields/text-field.tsx
+import { FormField } from '@safeform/core'
+import type { Action, TypedCtx, FieldName } from '@safeform/core'
+
+interface TextFieldProps<TAction extends Action<any, any, any, any>> {
+  ctx: TypedCtx<TAction>   // binds this field to a specific form's schema
+  name: FieldName<TAction> // inferred — only valid field names are accepted
+  label: string
+  placeholder?: string
+}
+
+export function TextField<TAction extends Action<any, any, any, any>>({
+  ctx: _ctx, // received for type inference; context is provided by the outer Provider
+  name,
+  label,
+  placeholder,
+}: TextFieldProps<TAction>) {
+  return (
+    <FormField name={name}>
+      {({ value, onChange, onBlur, errors }) => (
+        <div>
+          <label htmlFor={name}>{label}</label>
+          <input
+            id={name}
+            value={value as string}
+            placeholder={placeholder}
+            onChange={e => onChange(e.target.value)}
+            onBlur={onBlur}
+          />
+          {errors?.map(err => <p key={err}>{err}</p>)}
+        </div>
+      )}
+    </FormField>
+  )
+}
+```
+
+Spread `formProps` onto `<form>` and place the `Provider` outside it:
+
+```tsx
+const { _ctx, formProps, state } = useForm<UpsertEmployeeAction>({ ... })
+
+<SafeFormContext.Provider value={_ctx}>
+  <form {...formProps}>   {/* spreads onSubmit + noValidate */}
+    <TextField ctx={_ctx} name="firstName" label="First Name" />
+    <TextField ctx={_ctx} name="lastName" label="Last Name" />
+    {/* TypeScript error: name="ssnn" — not a valid field */}
+    <button type="submit" disabled={state.isPending}>Save</button>
+  </form>
+</SafeFormContext.Provider>
 ```
 
 ---

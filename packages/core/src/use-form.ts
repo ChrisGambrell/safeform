@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { isZodTuple, isNamedSteps } from './schema.js'
 import type { NamedSteps } from './schema.js'
 import type { Action, AnySchema } from './types.js'
-import type { SafeFormContextValue } from './form-context.js'
+import type { SafeFormContextValue, TypedCtx } from './form-context.js'
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -36,13 +36,29 @@ export type UseFormOptions<TSchema extends AnySchema, TPayload, TData> = {
   onError?: ((error: string) => void) | undefined
 } & ([TPayload] extends [never] ? { payload?: never } : { payload: TPayload })
 
-export interface UseFormReturn<TData> {
-  /** Submit handler — pass to <form onSubmit={handleSubmit}> */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface UseFormReturn<TAction extends Action<any, any, any, any>> {
+  /** Submit handler — pass to <form onSubmit={handleSubmit}> or use formProps */
   handleSubmit: (e: React.FormEvent) => void
+  /**
+   * Spread onto your <form> element. Includes `onSubmit` and `noValidate`.
+   *
+   * @example
+   * <SafeFormContext.Provider value={_ctx}>
+   *   <form {...formProps}>
+   *     <TextField ctx={_ctx} name="firstName" label="First Name" />
+   *   </form>
+   * </SafeFormContext.Provider>
+   */
+  formProps: { onSubmit: (e: React.FormEvent) => void; noValidate: true }
   /** Current form state */
-  state: SafeFormState<TData>
-  /** Context value for FormField/FormArray — pass to SafeFormContext.Provider */
-  _ctx: SafeFormContextValue
+  state: SafeFormState<TAction['_data']>
+  /**
+   * Typed context value. Place in `SafeFormContext.Provider` outside your
+   * `<form>` so all fields can read from it, and pass as `ctx` to reusable
+   * field components so TypeScript infers valid `name` values from the schema.
+   */
+  _ctx: TypedCtx<TAction>
   // Multi-step controls (always present; only meaningful when isMultiStep is true)
   step: number
   totalSteps: number
@@ -155,7 +171,7 @@ export function useForm<
     TAction['_payload'] extends z.ZodTypeAny ? z.output<TAction['_payload']> : never,
     TAction['_data']
   >,
-): UseFormReturn<TAction['_data']> {
+): UseFormReturn<TAction> {
   const { endpoint, schema, payload, onSuccess, onError } = options
 
   const isTuple = isZodTuple(schema)
@@ -297,7 +313,7 @@ export function useForm<
   // Context value for FormField/FormArray
   // ---------------------------------------------------------------------------
 
-  const ctx: SafeFormContextValue = {
+  const ctx: TypedCtx<TAction> = {
     rhf: rhf as SafeFormContextValue['rhf'],
     fieldErrors: state.fieldErrors,
     currentStep: step,
@@ -305,6 +321,7 @@ export function useForm<
 
   return {
     handleSubmit,
+    formProps: { onSubmit: handleSubmit, noValidate: true as const },
     state,
     _ctx: ctx,
     step,

@@ -22,7 +22,7 @@ export default function OnboardingPage() {
       )}
 
       <SafeFormContext.Provider value={form._ctx}>
-        <form onSubmit={form.handleSubmit} data-testid="onboarding-form" noValidate>
+        <form {...form.formProps} data-testid="onboarding-form">
           {form.step === 0 && (
             <div>
               <FormField name="username">
