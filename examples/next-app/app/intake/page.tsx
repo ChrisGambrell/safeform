@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm, SafeFormContext, FormField } from '@safeform/core'
+import { useForm, SafeFormContext, FormField, MaskedField } from '@safeform/core'
 import type { IntakeAction } from '../api/intake/route'
 import { intakeSchema } from '../api/intake/schema'
 
@@ -41,6 +41,46 @@ export default function IntakePage() {
                   </div>
                 )}
               </FormField>
+
+              <MaskedField name="dob" mask="date">
+                {({ value, onChange, onKeyDown, onBlur, placeholder, maxLength, errors }) => (
+                  <div>
+                    <label>Date of Birth</label>
+                    <input
+                      data-testid="dob-input"
+                      value={value}
+                      onChange={onChange}
+                      onKeyDown={onKeyDown}
+                      onBlur={onBlur}
+                      placeholder={placeholder}
+                      maxLength={maxLength}
+                    />
+                    {errors.map((e) => (
+                      <span key={e} data-testid="dob-error">{e}</span>
+                    ))}
+                  </div>
+                )}
+              </MaskedField>
+
+              <MaskedField name="phone" mask="phone">
+                {({ value, onChange, onKeyDown, onBlur, placeholder, maxLength, errors }) => (
+                  <div>
+                    <label>Phone</label>
+                    <input
+                      data-testid="phone-input"
+                      value={value}
+                      onChange={onChange}
+                      onKeyDown={onKeyDown}
+                      onBlur={onBlur}
+                      placeholder={placeholder}
+                      maxLength={maxLength}
+                    />
+                    {errors.map((e) => (
+                      <span key={e} data-testid="phone-error">{e}</span>
+                    ))}
+                  </div>
+                )}
+              </MaskedField>
             </div>
           )}
 
