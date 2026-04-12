@@ -1,3 +1,4 @@
+'use client'
 import { useCallback } from 'react'
 import { useWatch } from 'react-hook-form'
 import type { z } from 'zod'

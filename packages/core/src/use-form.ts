@@ -1,3 +1,4 @@
+'use client'
 import { useState, useCallback, useRef } from 'react'
 import { useForm as useRHF, type FieldValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'

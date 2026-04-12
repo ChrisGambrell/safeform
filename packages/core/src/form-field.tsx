@@ -1,3 +1,4 @@
+'use client'
 import { useController } from 'react-hook-form'
 import type { z } from 'zod'
 import { useSafeFormContext } from './form-context.js'
