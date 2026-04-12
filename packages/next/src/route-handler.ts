@@ -5,8 +5,8 @@ import {
   isNamedSteps,
   mergeStepData,
   namespaceStepData,
-} from 'safeform'
-import type { Action, AnySchema } from 'safeform'
+} from '@safeform/core'
+import type { Action, AnySchema } from '@safeform/core'
 
 // ---------------------------------------------------------------------------
 // Error messages used internally and in tests

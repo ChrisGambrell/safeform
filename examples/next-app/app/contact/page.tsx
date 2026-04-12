@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm, SafeFormContext, FormField } from 'safeform'
+import { useForm, SafeFormContext, FormField } from '@safeform/core'
 import type { ContactAction } from '../../actions/contact'
 import { contactSchema } from '../../actions/contact'
 

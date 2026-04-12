@@ -1,5 +1,5 @@
 {
-  "name": "safeform",
+  "name": "@safeform/core",
   "version": "0.0.1",
   "description": "End-to-end type-safe forms for React",
   "license": "MIT",
@@ -12,6 +12,9 @@
   },
   "homepage": "https://github.com/ChrisGambrell/safeform#readme",
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",

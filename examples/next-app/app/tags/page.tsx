@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm, SafeFormContext, FormField, FormArray } from 'safeform'
+import { useForm, SafeFormContext, FormField, FormArray } from '@safeform/core'
 import type { TagsAction } from '../../actions/tags'
 import { tagsSchema } from '../../actions/tags'
 

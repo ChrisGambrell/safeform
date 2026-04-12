@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { z } from 'zod'
-import { createAction, createSteps } from 'safeform'
+import { createAction, createSteps } from '@safeform/core'
 import { createRouteHandler, ERRORS } from './route-handler.js'
 
 // ---------------------------------------------------------------------------

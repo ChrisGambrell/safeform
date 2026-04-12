@@ -1,4 +1,4 @@
-import { createAction } from 'safeform'
+import { createAction } from '@safeform/core'
 import { z } from 'zod'
 
 export const employeeSchema = z.object({

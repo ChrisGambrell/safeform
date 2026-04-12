@@ -35,6 +35,9 @@ importers:
 
   examples/next-app:
     dependencies:
+      '@safeform/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@safeform/next':
         specifier: workspace:*
         version: link:../../packages/next
@@ -50,9 +53,6 @@ importers:
       react-hook-form:
         specifier: ^7.56.1
         version: 7.72.1(react@18.3.1)
-      safeform:
-        specifier: workspace:*
-        version: link:../../packages/core
       zod:
         specifier: ^3.24.2
         version: 3.25.76
@@ -115,10 +115,10 @@ importers:
       next:
         specifier: '>=14.0.0'
         version: 15.5.15(@playwright/test@1.59.1)(react-dom@19.2.5(react@18.3.1))(react@18.3.1)
-      safeform:
+    devDependencies:
+      '@safeform/core':
         specifier: workspace:*
         version: link:../core
-    devDependencies:
       typescript:
         specifier: ^5.8.3
         version: 5.9.3

@@ -3,7 +3,7 @@
 End-to-end type-safe forms for React. Define your schema once — get typed validation on the server, typed state on the client, and zero glue code in between.
 
 ```bash
-npm install safeform @safeform/next
+npm install @safeform/core @safeform/next
 ```
 
 > **Peer dependencies:** React 18+, Zod 3+, react-hook-form 7+
@@ -45,7 +45,7 @@ export const upsertEmployeeSchema = z.object({
 
 ```ts
 // lib/actions.ts
-import { createAction } from 'safeform'
+import { createAction } from '@safeform/core'
 import { getSession } from '@/lib/auth'
 
 export const publicAction = createAction()
@@ -116,7 +116,7 @@ export const POST = createRouteHandler(upsertEmployeeAction)
 ```tsx
 // app/employees/employee-form.tsx
 'use client'
-import { useForm, FormField, SafeFormContext } from 'safeform'
+import { useForm, FormField, SafeFormContext } from '@safeform/core'
 import { upsertEmployeeSchema } from '@/lib/schemas/employee'
 import type { UpsertEmployeeAction } from '@/actions/employees'
 import { useRouter } from 'next/navigation'
@@ -204,7 +204,7 @@ Use `createSteps` when each step has semantic meaning. The step name becomes the
 ```ts
 // lib/schemas/intake.ts
 import { z } from 'zod'
-import { createSteps } from 'safeform'
+import { createSteps } from '@safeform/core'
 
 export const intakeSchema = createSteps({
   vitals: z.object({
@@ -244,7 +244,7 @@ Both modes enforce that no field name is shared across steps — TypeScript will
 
 ```tsx
 // client — import FormField separately
-import { useForm, FormField, SafeFormContext } from 'safeform'
+import { useForm, FormField, SafeFormContext } from '@safeform/core'
 
 const {
   handleSubmit,
@@ -342,7 +342,7 @@ Write adapters once, reuse everywhere:
 
 ```tsx
 // components/fields/text-field.tsx
-import { FormField } from 'safeform'
+import { FormField } from '@safeform/core'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 

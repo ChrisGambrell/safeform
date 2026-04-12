@@ -1,5 +1,5 @@
-import { createAction } from 'safeform'
-import { createSteps } from 'safeform'
+import { createAction } from '@safeform/core'
+import { createSteps } from '@safeform/core'
 import { z } from 'zod'
 
 // Named multi-step (createSteps) — server receives namespaced data

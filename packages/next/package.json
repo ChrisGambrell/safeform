@@ -32,14 +32,13 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "dependencies": {
-    "safeform": "workspace:*"
-  },
   "peerDependencies": {
+    "@safeform/core": "*",
     "next": ">=14.0.0",
     "zod": "^3.0.0"
   },
   "devDependencies": {
+    "@safeform/core": "workspace:*",
     "zod": "^3.24.2",
     "vitest": "^3.1.2",
     "typescript": "^5.8.3"
