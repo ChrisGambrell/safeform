@@ -1,5 +1,13 @@
 # @safeform/next
 
+## 1.0.1
+
+### Patch Changes
+
+- 8118ec5: fix: include README.md in published files for both packages
+- Updated dependencies [8118ec5]
+  - @safeform/core@1.0.1
+
 ## 1.0.0
 
 ### Minor Changes

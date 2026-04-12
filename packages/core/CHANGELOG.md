@@ -1,5 +1,11 @@
 # @safeform/core
 
+## 1.0.1
+
+### Patch Changes
+
+- 8118ec5: fix: include README.md in published files for both packages
+
 ## 1.0.0
 
 ### Minor Changes
