@@ -3,7 +3,7 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["safeform", "@safeform/next"]],
+  "linked": [["@safeform/core", "@safeform/next"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
