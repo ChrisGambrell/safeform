@@ -19,13 +19,22 @@ export interface SafeFormState<TData> {
   isPending: boolean
 }
 
-export interface UseFormOptions<TPayload, TData> {
+/**
+ * Options accepted by `useForm<TAction>()`.
+ *
+ * - `schema` must match `TAction['_schema']` exactly (H-14 — type error on mismatch).
+ * - `payload` is required when `TAction` was created with a payload schema, and
+ *   prohibited when it was not (H-15 — type error on either violation).
+ */
+export type UseFormOptions<TSchema extends AnySchema, TPayload, TData> = {
   endpoint: string
-  schema: AnySchema
-  payload?: TPayload
+  /** Must match the schema passed to `action.create()`. */
+  schema: TSchema
+  /** Called with the typed server handler return value on success. */
   onSuccess?: (data: TData) => void
+  /** Called with the global error string on failure. */
   onError?: (error: string) => void
-}
+} & ([TPayload] extends [never] ? { payload?: never } : { payload: TPayload })
 
 export interface UseFormReturn<TData> {
   /** Submit handler — pass to <form onSubmit={handleSubmit}> */
@@ -138,6 +147,7 @@ function getTotalSteps(schema: AnySchema): number {
  */
 export function useForm<TAction extends Action<any, any, any, any>>(
   options: UseFormOptions<
+    TAction['_schema'],
     TAction['_payload'] extends z.ZodTypeAny ? z.output<TAction['_payload']> : never,
     TAction['_data']
   >,
