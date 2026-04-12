@@ -1,5 +1,11 @@
 # @safeform/core
 
+## 2.0.0
+
+### Minor Changes
+
+- 523f711: fix: FieldName now resolves deep dot-notation paths via ZodPaths
+
 ## 1.0.1
 
 ### Patch Changes
