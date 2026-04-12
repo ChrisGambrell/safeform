@@ -1,5 +1,17 @@
 # @safeform/next
 
+## 1.0.0
+
+### Minor Changes
+
+- 28eca3d: refactor: switch middleware API from next-based to return-based
+
+### Patch Changes
+
+- Updated dependencies [11ce7e5]
+- Updated dependencies [28eca3d]
+  - @safeform/core@1.0.0
+
 ## 0.0.4
 
 ### Patch Changes
