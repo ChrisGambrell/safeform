@@ -1,8 +1,8 @@
 'use client'
 
 import { useForm, SafeFormContext, FormField } from '@safeform/core'
-import type { IntakeAction } from '../../actions/intake'
-import { intakeSchema } from '../../actions/intake'
+import type { IntakeAction } from '../api/intake/route'
+import { intakeSchema } from '../api/intake/schema'
 
 export default function IntakePage() {
   const form = useForm<IntakeAction>({

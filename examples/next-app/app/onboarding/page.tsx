@@ -1,8 +1,8 @@
 'use client'
 
 import { useForm, SafeFormContext, FormField } from '@safeform/core'
-import type { OnboardingAction } from '../../actions/onboarding'
-import { onboardingSchema } from '../../actions/onboarding'
+import type { OnboardingAction } from '../api/onboarding/route'
+import { onboardingSchema } from '../api/onboarding/schema'
 
 export default function OnboardingPage() {
   const form = useForm<OnboardingAction>({

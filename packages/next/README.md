@@ -16,9 +16,15 @@ Mount a safeform action as a Next.js App Router route handler with a single line
 
 ```ts
 // app/api/employees/route.ts
+import { createAction } from '@safeform/core'
 import { createRouteHandler } from '@safeform/next'
-import { upsertEmployeeAction } from '@/actions/employees'
+import { upsertEmployeeSchema } from './schema'
 
+const upsertEmployeeAction = authedAction.create({ schema: upsertEmployeeSchema }, async (data, ctx) => {
+  return { success: true as const, data: { employeeId: 'emp-1' } }
+})
+
+export type UpsertEmployeeAction = typeof upsertEmployeeAction
 export const POST = createRouteHandler(upsertEmployeeAction)
 ```
 
@@ -73,7 +79,7 @@ All responses are JSON:
 ## Full example
 
 ```ts
-// lib/schemas/employee.ts
+// app/api/employees/schema.ts
 import { z } from 'zod'
 
 export const upsertEmployeeSchema = z.object({
@@ -82,9 +88,10 @@ export const upsertEmployeeSchema = z.object({
   role: z.enum(['Admin', 'Cashier', 'Janitor']),
 })
 
-// actions/employees.ts
+// app/api/employees/route.ts
 import { createAction } from '@safeform/core'
-import { upsertEmployeeSchema } from '@/lib/schemas/employee'
+import { createRouteHandler } from '@safeform/next'
+import { upsertEmployeeSchema } from './schema'
 import { z } from 'zod'
 
 const authedAction = createAction().use(async (next) => {
@@ -93,7 +100,7 @@ const authedAction = createAction().use(async (next) => {
   return next({ user: session.user })
 })
 
-export const upsertEmployeeAction = authedAction.create({
+const upsertEmployeeAction = authedAction.create({
   schema: upsertEmployeeSchema,
   payload: z.object({ employeeId: z.string().optional() }),
 }, async (data, payload, ctx) => {
@@ -101,10 +108,7 @@ export const upsertEmployeeAction = authedAction.create({
   return { success: true as const, data: { employeeId: employee.id } }
 })
 
-// app/api/employees/route.ts
-import { createRouteHandler } from '@safeform/next'
-import { upsertEmployeeAction } from '@/actions/employees'
-
+export type UpsertEmployeeAction = typeof upsertEmployeeAction
 export const POST = createRouteHandler(upsertEmployeeAction)
 ```
 

@@ -27,21 +27,7 @@ Most form libraries stop at the client. You get typed fields and validation, but
 
 ## Quick Start
 
-### 1. Define your schema
-
-```ts
-// lib/schemas/employee.ts
-import { z } from 'zod'
-
-export const upsertEmployeeSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  role: z.enum(['Admin', 'Cashier', 'Janitor']),
-  ssn: z.string().length(9),
-})
-```
-
-### 2. Create your base action builders
+### 1. Create your base action builders
 
 ```ts
 // lib/actions.ts
@@ -62,16 +48,33 @@ export const adminAction = authedAction.use(async (next, ctx) => {
 })
 ```
 
-### 3. Define your server action
+### 2. Define your schema
+
+The schema lives in a `schema.ts` file colocated with the route. It's imported by both the route handler (server) and the form (client), so it must not import any server-only code.
 
 ```ts
-// actions/employees.ts
+// app/api/employees/schema.ts
+import { z } from 'zod'
+
+export const upsertEmployeeSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  role: z.enum(['Admin', 'Cashier', 'Janitor']),
+  ssn: z.string().length(9),
+})
+```
+
+### 3. Define your action and mount the route handler
+
+```ts
+// app/api/employees/route.ts
+import { createRouteHandler } from '@safeform/next'
 import { authedAction } from '@/lib/actions'
-import { upsertEmployeeSchema } from '@/lib/schemas/employee'
+import { upsertEmployeeSchema } from './schema'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 
-export const upsertEmployeeAction = authedAction.create({
+const upsertEmployeeAction = authedAction.create({
   schema: upsertEmployeeSchema,
   payload: z.object({
     employeeId: z.string().cuid().optional(),  // hidden — for upsert
@@ -99,26 +102,17 @@ export const upsertEmployeeAction = authedAction.create({
 })
 
 export type UpsertEmployeeAction = typeof upsertEmployeeAction
-```
-
-### 4. Mount the route handler
-
-```ts
-// app/api/employees/route.ts
-import { createRouteHandler } from '@safeform/next'
-import { upsertEmployeeAction } from '@/actions/employees'
-
 export const POST = createRouteHandler(upsertEmployeeAction)
 ```
 
-### 5. Use the form on the client
+### 4. Use the form on the client
 
 ```tsx
 // app/employees/employee-form.tsx
 'use client'
 import { useForm, FormField, SafeFormContext } from '@safeform/core'
-import { upsertEmployeeSchema } from '@/lib/schemas/employee'
-import type { UpsertEmployeeAction } from '@/actions/employees'
+import { upsertEmployeeSchema } from '@/app/api/employees/schema'
+import type { UpsertEmployeeAction } from '@/app/api/employees/route'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
@@ -176,7 +170,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 ### Unnamed — flat merge
 
 ```ts
-// lib/schemas/onboarding.ts
+// app/api/onboarding/schema.ts
 import { z } from 'zod'
 
 export const onboardingSchema = z.tuple([
@@ -187,8 +181,10 @@ export const onboardingSchema = z.tuple([
 ```
 
 ```ts
-// actions/onboarding.ts
-export const onboardingAction = authedAction.create({
+// app/api/onboarding/route.ts
+import { onboardingSchema } from './schema'
+
+const onboardingAction = authedAction.create({
   schema: onboardingSchema,
 }, async (data, ctx) => {
   // data is flattened: { firstName, lastName, dob, address, city, zip, email, phone }
@@ -202,7 +198,7 @@ export const onboardingAction = authedAction.create({
 Use `createSteps` when each step has semantic meaning. The step name becomes the key in the server handler's `data` argument — no risk of the name and schema falling out of sync.
 
 ```ts
-// lib/schemas/intake.ts
+// app/api/intake/schema.ts
 import { z } from 'zod'
 import { createSteps } from '@safeform/core'
 
@@ -226,8 +222,10 @@ export const intakeSchema = createSteps({
 ```
 
 ```ts
-// actions/intake.ts
-export const intakeAction = authedAction.create({
+// app/api/intake/route.ts
+import { intakeSchema } from './schema'
+
+const intakeAction = authedAction.create({
   schema: intakeSchema,
 }, async (data, ctx) => {
   // data is namespaced:

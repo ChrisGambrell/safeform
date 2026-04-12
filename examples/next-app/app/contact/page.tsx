@@ -1,8 +1,8 @@
 'use client'
 
 import { useForm, SafeFormContext, FormField } from '@safeform/core'
-import type { ContactAction } from '../../actions/contact'
-import { contactSchema } from '../../actions/contact'
+import type { ContactAction } from '../api/contact/route'
+import { contactSchema } from '../api/contact/schema'
 
 export default function ContactPage() {
   const form = useForm<ContactAction>({

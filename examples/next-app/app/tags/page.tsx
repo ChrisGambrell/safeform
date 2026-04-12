@@ -1,8 +1,8 @@
 'use client'
 
 import { useForm, SafeFormContext, FormField, FormArray } from '@safeform/core'
-import type { TagsAction } from '../../actions/tags'
-import { tagsSchema } from '../../actions/tags'
+import type { TagsAction } from '../api/tags/route'
+import { tagsSchema } from '../api/tags/schema'
 
 export default function TagsPage() {
   const form = useForm<TagsAction>({

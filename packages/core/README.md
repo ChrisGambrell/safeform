@@ -12,21 +12,7 @@ npm install @safeform/core @safeform/next
 
 ## Quick Start
 
-### 1. Define your schema
-
-```ts
-// lib/schemas/employee.ts
-import { z } from 'zod'
-
-export const upsertEmployeeSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  role: z.enum(['Admin', 'Cashier', 'Janitor']),
-  ssn: z.string().length(9),
-})
-```
-
-### 2. Create your base action builders
+### 1. Create your base action builders
 
 ```ts
 // lib/actions.ts
@@ -42,15 +28,32 @@ export const authedAction = createAction().use(async (next) => {
 })
 ```
 
-### 3. Define your server action
+### 2. Define your schema
+
+The schema lives in a `schema.ts` file colocated with the route — safe to import on both client and server.
 
 ```ts
-// actions/employees.ts
-import { authedAction } from '@/lib/actions'
-import { upsertEmployeeSchema } from '@/lib/schemas/employee'
+// app/api/employees/schema.ts
 import { z } from 'zod'
 
-export const upsertEmployeeAction = authedAction.create({
+export const upsertEmployeeSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  role: z.enum(['Admin', 'Cashier', 'Janitor']),
+  ssn: z.string().length(9),
+})
+```
+
+### 3. Define your action and mount the route handler
+
+```ts
+// app/api/employees/route.ts
+import { createRouteHandler } from '@safeform/next'
+import { authedAction } from '@/lib/actions'
+import { upsertEmployeeSchema } from './schema'
+import { z } from 'zod'
+
+const upsertEmployeeAction = authedAction.create({
   schema: upsertEmployeeSchema,
   payload: z.object({ employeeId: z.string().cuid().optional() }),
 }, async (data, payload, ctx) => {
@@ -63,6 +66,7 @@ export const upsertEmployeeAction = authedAction.create({
 })
 
 export type UpsertEmployeeAction = typeof upsertEmployeeAction
+export const POST = createRouteHandler(upsertEmployeeAction)
 ```
 
 ### 4. Use the form on the client
@@ -70,8 +74,8 @@ export type UpsertEmployeeAction = typeof upsertEmployeeAction
 ```tsx
 'use client'
 import { useForm, FormField, SafeFormContext } from '@safeform/core'
-import { upsertEmployeeSchema } from '@/lib/schemas/employee'
-import type { UpsertEmployeeAction } from '@/actions/employees'
+import { upsertEmployeeSchema } from '@/app/api/employees/schema'
+import type { UpsertEmployeeAction } from '@/app/api/employees/route'
 
 export function EmployeeForm({ employee }: { employee?: Employee }) {
   const { handleSubmit, state, _ctx } = useForm<UpsertEmployeeAction>({

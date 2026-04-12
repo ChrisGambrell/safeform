@@ -1,8 +1,8 @@
 'use client'
 
 import { useForm, SafeFormContext, FormField } from '@safeform/core'
-import type { EmployeeAction } from '../../actions/employee'
-import { employeeSchema } from '../../actions/employee'
+import type { EmployeeAction } from '../api/employees/route'
+import { employeeSchema } from '../api/employees/schema'
 
 export default function EmployeePage() {
   const form = useForm<EmployeeAction>({
