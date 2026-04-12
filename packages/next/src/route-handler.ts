@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import type { z } from 'zod'
 import {
   runMiddlewareChain,
   isZodTuple,
@@ -50,7 +50,7 @@ function parseSchema(schema: unknown, rawData: unknown): ParseResult {
 
   if (isNamedSteps(schema)) {
     const stepNames = Object.keys(schema._steps)
-    const stepSchemas = Object.values(schema._steps) as z.ZodObject<any>[]
+    const stepSchemas = Object.values(schema._steps)
     const stepData = Array.isArray(rawData) ? rawData : []
     const parsedSteps: unknown[] = []
 
@@ -72,7 +72,8 @@ function parseSchema(schema: unknown, rawData: unknown): ParseResult {
   }
 
   if (isZodTuple(schema)) {
-    const stepSchemas = (schema as z.ZodTuple<any>).items as z.ZodObject<any>[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stepSchemas = schema.items as z.ZodObject<any>[]
     const stepData = Array.isArray(rawData) ? rawData : []
     const parsedSteps: unknown[] = []
 
@@ -155,7 +156,7 @@ export function createRouteHandler<
     // Parse + validate payload
     let parsedPayload: unknown = undefined
     if (action._payload) {
-      const payloadResult = (action._payload as z.ZodTypeAny).safeParse(body.payload)
+      const payloadResult = action._payload.safeParse(body.payload)
       if (!payloadResult.success) {
         return Response.json(
           { success: false, error: ERRORS.INVALID_PAYLOAD },

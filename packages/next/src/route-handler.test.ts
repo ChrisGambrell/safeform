@@ -32,7 +32,7 @@ const schema = z.object({ name: z.string(), age: z.number() })
 
 describe('createRouteHandler() — R-1', () => {
   it('returns a function', () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: true as const,
     }))
     const handler = createRouteHandler(action)
@@ -40,7 +40,7 @@ describe('createRouteHandler() — R-1', () => {
   })
 
   it('returns a Response when called', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: true as const,
     }))
     const handler = createRouteHandler(action)
@@ -55,7 +55,7 @@ describe('createRouteHandler() — R-1', () => {
 
 describe('JSON body parsing — R-2', () => {
   it('returns 400 with error message on invalid JSON', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: true as const,
     }))
     const handler = createRouteHandler(action)
@@ -71,7 +71,7 @@ describe('JSON body parsing — R-2', () => {
   })
 
   it('returns 400 when body is not an object', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: true as const,
     }))
     const { status } = await callHandler(action, 'just a string')
@@ -80,7 +80,7 @@ describe('JSON body parsing — R-2', () => {
 
   it('passes parsed data to the handler', async () => {
     const received: unknown[] = []
-    const action = createAction().create({ schema }, async (data, _ctx) => {
+    const action = createAction().create({ schema }, (data, _ctx) => {
       received.push(data)
       return { success: true as const }
     })
@@ -93,7 +93,7 @@ describe('JSON body parsing — R-2', () => {
     const payload = z.object({ facilityId: z.string() })
     const received: unknown[] = []
 
-    const action = createAction().create({ schema, payload }, async (data, p, _ctx) => {
+    const action = createAction().create({ schema, payload }, (data, p, _ctx) => {
       received.push({ data, payload: p })
       return { success: true as const }
     })
@@ -110,7 +110,7 @@ describe('JSON body parsing — R-2', () => {
   })
 
   it('returns 200 with success data on valid request', async () => {
-    const action = createAction().create({ schema }, async (data, _ctx) => ({
+    const action = createAction().create({ schema }, (data, _ctx) => ({
       success: true as const,
       data: { greeting: `Hello ${data.name}` },
     }))
@@ -121,7 +121,7 @@ describe('JSON body parsing — R-2', () => {
   })
 
   it('returns 422 with fieldErrors on schema validation failure', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: true as const,
     }))
 
@@ -133,7 +133,7 @@ describe('JSON body parsing — R-2', () => {
   })
 
   it('returns 422 with fieldErrors returned by the handler', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: false as const,
       fieldErrors: { name: ['Name already taken'] },
     }))
@@ -145,7 +145,7 @@ describe('JSON body parsing — R-2', () => {
   })
 
   it('returns 400 with error on handler global error', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema }, (_data, _ctx) => ({
       success: false as const,
       error: 'Something went wrong',
     }))
@@ -157,10 +157,10 @@ describe('JSON body parsing — R-2', () => {
 
   it('returns 401 when middleware throws Unauthorized', async () => {
     const action = createAction()
-      .use(async (_next, _ctx) => {
+      .use((_next, _ctx) => {
         throw new Error('Unauthorized')
       })
-      .create({ schema }, async (_data, _ctx) => ({ success: true as const }))
+      .create({ schema }, (_data, _ctx) => ({ success: true as const }))
 
     const { status, body } = await callHandler(action, { data: { name: 'Alice', age: 30 } })
     expect(status).toBe(401)
@@ -169,17 +169,17 @@ describe('JSON body parsing — R-2', () => {
 
   it('returns 403 when middleware throws Forbidden', async () => {
     const action = createAction()
-      .use(async (_next, _ctx) => {
+      .use((_next, _ctx) => {
         throw new Error('Forbidden')
       })
-      .create({ schema }, async (_data, _ctx) => ({ success: true as const }))
+      .create({ schema }, (_data, _ctx) => ({ success: true as const }))
 
     const { status } = await callHandler(action, { data: { name: 'Alice', age: 30 } })
     expect(status).toBe(403)
   })
 
   it('returns 500 when handler throws unexpectedly', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => {
+    const action = createAction().create({ schema }, (_data, _ctx) => {
       throw new Error('Database exploded')
     })
 
@@ -189,7 +189,7 @@ describe('JSON body parsing — R-2', () => {
   })
 
   it('does not leak error details on 500', async () => {
-    const action = createAction().create({ schema }, async (_data, _ctx) => {
+    const action = createAction().create({ schema }, (_data, _ctx) => {
       throw new Error('SELECT * FROM secrets')
     })
 
@@ -210,7 +210,7 @@ describe('createRouteHandler — unnamed multi-step (z.tuple)', () => {
 
   it('flattens step data and passes merged object to handler', async () => {
     const received: unknown[] = []
-    const action = createAction().create({ schema: tupleSchema }, async (data, _ctx) => {
+    const action = createAction().create({ schema: tupleSchema }, (data, _ctx) => {
       received.push(data)
       return { success: true as const }
     })
@@ -227,7 +227,7 @@ describe('createRouteHandler — unnamed multi-step (z.tuple)', () => {
   })
 
   it('returns 422 with field errors when a step fails validation', async () => {
-    const action = createAction().create({ schema: tupleSchema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema: tupleSchema }, (_data, _ctx) => ({
       success: true as const,
     }))
 
@@ -253,7 +253,7 @@ describe('createRouteHandler — named multi-step (createSteps)', () => {
 
   it('namespaces step data under step names and passes to handler', async () => {
     const received: unknown[] = []
-    const action = createAction().create({ schema: namedSchema }, async (data, _ctx) => {
+    const action = createAction().create({ schema: namedSchema }, (data, _ctx) => {
       received.push(data)
       return { success: true as const }
     })
@@ -269,7 +269,7 @@ describe('createRouteHandler — named multi-step (createSteps)', () => {
   })
 
   it('returns 422 when a named step fails validation', async () => {
-    const action = createAction().create({ schema: namedSchema }, async (_data, _ctx) => ({
+    const action = createAction().create({ schema: namedSchema }, (_data, _ctx) => ({
       success: true as const,
     }))
 
