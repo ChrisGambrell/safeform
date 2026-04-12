@@ -1,5 +1,12 @@
 # @safeform/core
 
+## 1.0.0
+
+### Minor Changes
+
+- 11ce7e5: feat: add formProps spread, TypedCtx, and FieldName for typed reusable field components
+- 28eca3d: refactor: switch middleware API from next-based to return-based
+
 ## 0.0.4
 
 ### Patch Changes
