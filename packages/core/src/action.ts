@@ -6,9 +6,11 @@ import type { Action, ActionHandler, ActionResult, MiddlewareFn } from './types.
 // ---------------------------------------------------------------------------
 
 export class ActionBuilder<TCtx> {
-  private middlewares: MiddlewareFn<unknown, unknown>[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private middlewares: MiddlewareFn<any, any>[]
 
-  constructor(middlewares: MiddlewareFn<unknown, unknown>[] = []) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(middlewares: MiddlewareFn<any, any>[] = []) {
     this.middlewares = middlewares
   }
 

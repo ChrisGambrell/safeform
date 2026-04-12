@@ -56,6 +56,7 @@ export interface Action<
   _payload: TPayload
   _ctx: TCtx // phantom type — never holds a value at runtime
   _data: TData // phantom type — never holds a value at runtime
-  _middlewares: MiddlewareFn<unknown, unknown>[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _middlewares: MiddlewareFn<any, any>[]
   _handler: ActionHandler<TSchema, TPayload, TCtx, TData>
 }
