@@ -157,7 +157,7 @@ describe('JSON body parsing — R-2', () => {
 
   it('returns 401 when middleware throws Unauthorized', async () => {
     const action = createAction()
-      .use((_next, _ctx) => {
+      .use((_ctx) => {
         throw new Error('Unauthorized')
       })
       .create({ schema }, (_data, _ctx) => ({ success: true as const }))
@@ -169,7 +169,7 @@ describe('JSON body parsing — R-2', () => {
 
   it('returns 403 when middleware throws Forbidden', async () => {
     const action = createAction()
-      .use((_next, _ctx) => {
+      .use((_ctx) => {
         throw new Error('Forbidden')
       })
       .create({ schema }, (_data, _ctx) => ({ success: true as const }))

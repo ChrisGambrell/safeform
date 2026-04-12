@@ -36,15 +36,15 @@ import { getSession } from '@/lib/auth'
 
 export const publicAction = createAction()
 
-export const authedAction = createAction().use(async (next) => {
+export const authedAction = createAction().use(async (ctx) => {
   const session = await getSession()
   if (!session) throw new Error('Unauthorized')
-  return next({ user: session.user })
+  return { ...ctx, user: session.user }
 })
 
-export const adminAction = authedAction.use(async (next, ctx) => {
+export const adminAction = authedAction.use(async (ctx) => {
   if (ctx.user.role !== 'Admin') throw new Error('Forbidden')
-  return next(ctx)
+  return ctx
 })
 ```
 
@@ -387,14 +387,14 @@ Then in your forms:
 
 ```ts
 // Add as many layers as you need
-const superAdminAction = adminAction.use(async (next, ctx) => {
+const superAdminAction = adminAction.use(async (ctx) => {
   const isSuperAdmin = await db.user.isSuperAdmin(ctx.user.id)
   if (!isSuperAdmin) throw new Error('Forbidden')
-  return next({ ...ctx, isSuperAdmin: true })
+  return { ...ctx, isSuperAdmin: true }
 })
 
 // ctx.isSuperAdmin is typed
-export const dangerousAction = superAdminAction.create({ schema }, async (data, _, ctx) => {
+export const dangerousAction = superAdminAction.create({ schema }, async (data, ctx) => {
   ctx.isSuperAdmin  // true — TypeScript knows
 })
 ```

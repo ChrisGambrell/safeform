@@ -14,9 +14,7 @@ describe('runMiddlewareChain()', () => {
   })
 
   it('executes a single middleware and returns updated ctx', async () => {
-    const middleware = vi.fn(async (next: (ctx: object) => Promise<void>, ctx: object) => {
-      await next({ ...ctx, role: 'admin' })
-    })
+    const middleware = vi.fn(async (ctx: object) => ({ ...ctx, role: 'admin' }))
 
     const ctx = await runMiddlewareChain([middleware], {})
     expect(ctx).toEqual({ role: 'admin' })
@@ -26,18 +24,9 @@ describe('runMiddlewareChain()', () => {
   it('executes middlewares in order', async () => {
     const order: number[] = []
 
-    const mw1 = async (next: (ctx: object) => Promise<void>, ctx: object) => {
-      order.push(1)
-      await next({ ...ctx, step1: true })
-    }
-    const mw2 = async (next: (ctx: object) => Promise<void>, ctx: object) => {
-      order.push(2)
-      await next({ ...ctx, step2: true })
-    }
-    const mw3 = async (next: (ctx: object) => Promise<void>, ctx: object) => {
-      order.push(3)
-      await next({ ...ctx, step3: true })
-    }
+    const mw1 = async (ctx: object) => { order.push(1); return { ...ctx, step1: true } }
+    const mw2 = async (ctx: object) => { order.push(2); return { ...ctx, step2: true } }
+    const mw3 = async (ctx: object) => { order.push(3); return { ...ctx, step3: true } }
 
     const ctx = await runMiddlewareChain([mw1, mw2, mw3], {})
     expect(order).toEqual([1, 2, 3])
@@ -47,46 +36,24 @@ describe('runMiddlewareChain()', () => {
   it('each middleware receives ctx from the previous layer', async () => {
     const seenCtx: object[] = []
 
-    const mw1 = async (next: (ctx: object) => Promise<void>, _ctx: object) => {
-      await next({ user: 'alice' })
-    }
-    const mw2 = async (next: (ctx: object) => Promise<void>, ctx: object) => {
-      seenCtx.push(ctx)
-      await next({ ...ctx, role: 'admin' })
-    }
-    const mw3 = async (next: (ctx: object) => Promise<void>, ctx: object) => {
-      seenCtx.push(ctx)
-      await next(ctx)
-    }
+    const mw1 = async (_ctx: object) => ({ user: 'alice' })
+    const mw2 = async (ctx: object) => { seenCtx.push(ctx); return { ...ctx, role: 'admin' } }
+    const mw3 = async (ctx: object) => { seenCtx.push(ctx); return ctx }
 
     await runMiddlewareChain([mw1, mw2, mw3], {})
     expect(seenCtx[0]).toEqual({ user: 'alice' })
     expect(seenCtx[1]).toEqual({ user: 'alice', role: 'admin' })
   })
 
-  it('throws if middleware does not call next()', async () => {
-    const mw = async (_next: (ctx: object) => Promise<void>, _ctx: object) => {
-      // deliberately skips calling next
-    }
-
-    await expect(runMiddlewareChain([mw], {})).rejects.toThrow(
-      'Middleware did not call next()',
-    )
-  })
-
   it('propagates errors thrown inside middleware', async () => {
-    const mw = async (_next: (ctx: object) => Promise<void>, _ctx: object) => {
-      throw new Error('Unauthorized')
-    }
+    const mw = async (_ctx: object) => { throw new Error('Unauthorized') }
 
     await expect(runMiddlewareChain([mw], {})).rejects.toThrow('Unauthorized')
   })
 
   it('stops chain execution when middleware throws', async () => {
     const mw2 = vi.fn()
-    const mw1 = async (_next: (ctx: object) => Promise<void>, _ctx: object) => {
-      throw new Error('Forbidden')
-    }
+    const mw1 = async (_ctx: object) => { throw new Error('Forbidden') }
 
     await expect(runMiddlewareChain([mw1, mw2], {})).rejects.toThrow('Forbidden')
     expect(mw2).not.toHaveBeenCalled()
@@ -96,8 +63,8 @@ describe('runMiddlewareChain()', () => {
     const schema = z.object({ name: z.string() })
 
     const action = createAction()
-      .use(async (next, ctx) => next({ ...ctx, user: 'alice' }))
-      .use(async (next, ctx) => next({ ...ctx, role: 'admin' }))
+      .use(async (ctx) => ({ ...ctx, user: 'alice' }))
+      .use(async (ctx) => ({ ...ctx, role: 'admin' }))
       .create({ schema }, async (_data, ctx) => ({
         success: true as const,
         data: ctx,

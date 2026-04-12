@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import { createAction } from './action.js'
+import { runMiddlewareChain } from './middleware.js'
 
 const schema = z.object({
   name: z.string(),
@@ -75,13 +76,13 @@ describe('createAction()', () => {
 describe('.use(middleware)', () => {
   it('returns a new ActionBuilder (immutable — original unchanged)', () => {
     const base = createAction()
-    const withMiddleware = base.use(async (next, ctx) => next({ ...ctx, user: 'alice' }))
+    const withMiddleware = base.use(async (ctx) => ({ ...ctx, user: 'alice' }))
 
     expect(withMiddleware).not.toBe(base)
   })
 
   it('adds middleware to the chain', () => {
-    const mw1 = vi.fn(async (next: (ctx: object) => Promise<void>, ctx: object) => next(ctx))
+    const mw1 = vi.fn(async (ctx: object) => ctx)
     const action = createAction()
       .use(mw1)
       .create({ schema }, async (_data, _ctx) => ({
@@ -93,9 +94,9 @@ describe('.use(middleware)', () => {
   })
 
   it('stacks multiple middleware layers in order', () => {
-    const mw1 = vi.fn(async (next: (ctx: object) => Promise<void>, ctx: object) => next(ctx))
-    const mw2 = vi.fn(async (next: (ctx: object) => Promise<void>, ctx: object) => next(ctx))
-    const mw3 = vi.fn(async (next: (ctx: object) => Promise<void>, ctx: object) => next(ctx))
+    const mw1 = vi.fn(async (ctx: object) => ctx)
+    const mw2 = vi.fn(async (ctx: object) => ctx)
+    const mw3 = vi.fn(async (ctx: object) => ctx)
 
     const action = createAction()
       .use(mw1)
@@ -113,22 +114,13 @@ describe('.use(middleware)', () => {
     const receivedCtx = { value: '' }
 
     const action = createAction()
-      .use(async (next, ctx) => next({ ...ctx, role: 'admin' }))
+      .use(async (ctx) => ({ ...ctx, role: 'admin' }))
       .create({ schema }, async (_data, ctx) => {
         receivedCtx.value = (ctx as { role: string }).role
         return { success: true as const }
       })
 
-    // Simulate what the route handler will do: run middleware chain then handler
-    let finalCtx: object = {}
-    for (const mw of action._middlewares) {
-      await (mw as (next: (ctx: object) => Promise<void>, ctx: object) => Promise<void>)(
-        async (ctx) => {
-          finalCtx = ctx
-        },
-        finalCtx,
-      )
-    }
+    const finalCtx = await runMiddlewareChain(action._middlewares, {})
     await action._handler({ name: 'Alice', age: 30 }, finalCtx)
 
     expect(receivedCtx.value).toBe('admin')
@@ -136,20 +128,11 @@ describe('.use(middleware)', () => {
 
   it('middleware throwing propagates the error', async () => {
     const action = createAction()
-      .use(async (_next, _ctx) => {
+      .use(async (_ctx) => {
         throw new Error('Unauthorized')
       })
       .create({ schema }, async (_data, _ctx) => ({ success: true as const }))
 
-    const runMiddleware = async () => {
-      for (const mw of action._middlewares) {
-        await (mw as (next: (ctx: object) => Promise<void>, ctx: object) => Promise<void>)(
-          async () => {},
-          {},
-        )
-      }
-    }
-
-    await expect(runMiddleware()).rejects.toThrow('Unauthorized')
+    await expect(runMiddlewareChain(action._middlewares, {})).rejects.toThrow('Unauthorized')
   })
 })

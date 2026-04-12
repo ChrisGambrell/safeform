@@ -21,10 +21,10 @@ import { getSession } from '@/lib/auth'
 
 export const publicAction = createAction()
 
-export const authedAction = createAction().use(async (next) => {
+export const authedAction = createAction().use(async (ctx) => {
   const session = await getSession()
   if (!session) throw new Error('Unauthorized')
-  return next({ user: session.user })
+  return { ...ctx, user: session.user }
 })
 ```
 
@@ -217,15 +217,15 @@ const schema = z.object({
 ## Middleware
 
 ```ts
-export const authedAction = createAction().use(async (next) => {
+export const authedAction = createAction().use(async (ctx) => {
   const session = await getSession()
   if (!session) throw new Error('Unauthorized')
-  return next({ user: session.user })
+  return { ...ctx, user: session.user }
 })
 
-export const adminAction = authedAction.use(async (next, ctx) => {
+export const adminAction = authedAction.use(async (ctx) => {
   if (ctx.user.role !== 'Admin') throw new Error('Forbidden')
-  return next(ctx)
+  return ctx
 })
 ```
 

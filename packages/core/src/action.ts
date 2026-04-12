@@ -16,18 +16,18 @@ export class ActionBuilder<TCtx> {
   }
 
   /**
-   * Add a middleware layer. Each middleware receives the previous ctx and
-   * can extend it before passing to the next layer.
+   * Add a middleware layer. Each middleware receives the current ctx and
+   * returns the new ctx for the next layer.
    *
    * @example
-   * const authedAction = createAction().use(async (next, ctx) => {
+   * const authedAction = createAction().use(async (ctx) => {
    *   const session = await getSession()
    *   if (!session) throw new Error('Unauthorized')
-   *   return next({ ...ctx, user: session.user })
+   *   return { ...ctx, user: session.user }
    * })
    */
   use<TCtxOut extends object>(
-    middleware: (next: (ctx: TCtxOut) => Promise<void>, ctx: TCtx) => Promise<void>,
+    middleware: (ctx: TCtx) => Promise<TCtxOut> | TCtxOut,
   ): ActionBuilder<TCtxOut> {
     return new ActionBuilder<TCtxOut>([
       ...this.middlewares,
@@ -123,10 +123,10 @@ export class ActionBuilder<TCtx> {
  * const publicAction = createAction()
  *
  * // Auth required
- * const authedAction = createAction().use(async (next, ctx) => {
+ * const authedAction = createAction().use(async (ctx) => {
  *   const session = await getSession()
  *   if (!session) throw new Error('Unauthorized')
- *   return next({ user: session.user })
+ *   return { ...ctx, user: session.user }
  * })
  */
 export function createAction(): ActionBuilder<object> {

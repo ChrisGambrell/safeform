@@ -94,10 +94,10 @@ import { createRouteHandler } from '@safeform/next'
 import { upsertEmployeeSchema } from './schema'
 import { z } from 'zod'
 
-const authedAction = createAction().use(async (next) => {
+const authedAction = createAction().use(async (ctx) => {
   const session = await getSession()
   if (!session) throw new Error('Unauthorized')
-  return next({ user: session.user })
+  return { ...ctx, user: session.user }
 })
 
 const upsertEmployeeAction = authedAction.create({

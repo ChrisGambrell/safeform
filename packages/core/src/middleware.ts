@@ -2,13 +2,10 @@
 import type { MiddlewareFn } from './types.js'
 
 /**
- * Executes a middleware chain in order, composing ctx as each layer calls next().
+ * Executes a middleware chain in order, threading ctx through each layer.
  *
- * Each middleware receives the current ctx and a `next` function. Calling
- * next(newCtx) passes control to the next middleware with the updated ctx.
- * The final resolved ctx is returned.
- *
- * If any middleware throws, the error propagates immediately.
+ * Each middleware receives the current ctx and returns the new ctx for the
+ * next layer. If any middleware throws, the error propagates immediately.
  *
  * @example
  * const ctx = await runMiddlewareChain(action._middlewares, {})
@@ -18,29 +15,11 @@ export async function runMiddlewareChain(
   middlewares: MiddlewareFn<any, any>[],
   initialCtx: unknown,
 ): Promise<unknown> {
-  let currentCtx = initialCtx
+  let ctx = initialCtx
 
   for (const middleware of middlewares) {
-    let nextCtx: unknown = currentCtx
-    let nextCalled = false
-
-    await middleware(
-      (ctx) => {
-        nextCalled = true
-        nextCtx = ctx
-        return Promise.resolve()
-      },
-      currentCtx,
-    )
-
-    if (!nextCalled) {
-      throw new Error(
-        'Middleware did not call next(). Every middleware must call next(ctx) to continue the chain.',
-      )
-    }
-
-    currentCtx = nextCtx
+    ctx = await middleware(ctx)
   }
 
-  return currentCtx
+  return ctx
 }

@@ -23,10 +23,7 @@ export type ActionResult<TData = void> =
 // Middleware types
 // ---------------------------------------------------------------------------
 
-export type MiddlewareFn<TCtxIn, TCtxOut> = (
-  next: (ctx: TCtxOut) => Promise<void>,
-  ctx: TCtxIn,
-) => Promise<void>
+export type MiddlewareFn<TCtxIn, TCtxOut> = (ctx: TCtxIn) => Promise<TCtxOut>
 
 // ---------------------------------------------------------------------------
 // Action handler types
