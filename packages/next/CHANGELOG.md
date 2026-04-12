@@ -1,5 +1,13 @@
 # @safeform/next
 
+## 0.0.3
+
+### Patch Changes
+
+- 8cbcc09: Add package-level README
+- Updated dependencies [8cbcc09]
+  - @safeform/core@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
