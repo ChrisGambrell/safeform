@@ -4,6 +4,14 @@
   "description": "End-to-end type-safe forms for React",
   "license": "MIT",
   "type": "module",
+  "keywords": ["react", "form", "zod", "typescript", "validation", "typesafe", "react-hook-form"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChrisGambrell/safeform.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/ChrisGambrell/safeform#readme",
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": "./dist/index.js",

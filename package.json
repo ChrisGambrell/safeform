@@ -8,16 +8,20 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\" --ignore-path .gitignore"
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\" --ignore-path .gitignore",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "turbo": "^2.5.3",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.3",
+    "@changesets/cli": "^2.30.0",
     "@eslint/js": "^9.26.0",
-    "typescript-eslint": "^8.32.0",
     "eslint": "^9.26.0",
-    "jsdom": "^26.1.0"
+    "jsdom": "^26.1.0",
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.0"
   },
   "packageManager": "pnpm@9.15.1"
 }

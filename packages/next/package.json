@@ -4,6 +4,17 @@
   "description": "Next.js App Router adapter for safeform",
   "license": "MIT",
   "type": "module",
+  "keywords": ["safeform", "next", "nextjs", "react", "form", "zod", "typescript"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChrisGambrell/safeform.git",
+    "directory": "packages/next"
+  },
+  "homepage": "https://github.com/ChrisGambrell/safeform#readme",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
