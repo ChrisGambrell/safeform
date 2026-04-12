@@ -1,5 +1,11 @@
 # @safeform/core
 
+## 0.0.3
+
+### Patch Changes
+
+- 8cbcc09: Add package-level README
+
 ## 0.0.2
 
 ### Patch Changes
