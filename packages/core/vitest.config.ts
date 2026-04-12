@@ -13,11 +13,12 @@ export default defineConfig({
         },
       },
       {
-        // jsdom environment for React hook tests (.test.tsx)
+        // jsdom environment for React hook and component tests (.test.tsx)
         test: {
           name: 'jsdom',
           environment: 'jsdom',
           include: ['src/**/*.test.tsx'],
+          setupFiles: ['src/test-setup.ts'],
         },
       },
     ],

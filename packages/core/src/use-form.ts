@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { useForm as useRHF, type FieldValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { z } from 'zod'
+import { z } from 'zod'
 import { isZodTuple, isNamedSteps } from './schema.js'
 import type { NamedSteps } from './schema.js'
 import type { Action } from './types.js'
@@ -48,6 +48,43 @@ export interface UseFormReturn<TData> {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Auto-extract default values from a Zod object schema so that useFieldArray
+ * has a properly initialized array in RHF's internal store.
+ */
+function extractDefaultValues(schema: z.ZodTypeAny): Record<string, unknown> {
+  let unwrapped = schema
+  // Unwrap optional/nullable/default wrappers
+  while (
+    unwrapped instanceof z.ZodOptional ||
+    unwrapped instanceof z.ZodNullable ||
+    unwrapped instanceof z.ZodDefault
+  ) {
+    unwrapped = (unwrapped as z.ZodOptional<z.ZodTypeAny>).unwrap?.() ??
+      (unwrapped as z.ZodDefault<z.ZodTypeAny>)._def.innerType
+  }
+  if (!(unwrapped instanceof z.ZodObject)) return {}
+  const shape = (unwrapped as z.ZodObject<z.ZodRawShape>).shape
+  const defaults: Record<string, unknown> = {}
+  for (const [key, fieldSchema] of Object.entries(shape)) {
+    let inner = fieldSchema as z.ZodTypeAny
+    while (
+      inner instanceof z.ZodOptional ||
+      inner instanceof z.ZodNullable ||
+      inner instanceof z.ZodDefault
+    ) {
+      inner = (inner as z.ZodOptional<z.ZodTypeAny>).unwrap?.() ??
+        (inner as z.ZodDefault<z.ZodTypeAny>)._def.innerType
+    }
+    if (inner instanceof z.ZodArray) {
+      defaults[key] = []
+    } else if (inner instanceof z.ZodObject) {
+      defaults[key] = extractDefaultValues(inner)
+    }
+  }
+  return defaults
+}
 
 type ServerResponse = {
   success: boolean
@@ -133,6 +170,7 @@ export function useForm<TAction extends Action<any, any, any, any>>(
   const rhf = useRHF<FieldValues>({
     resolver: zodResolver(getStepSchema(schema, step)),
     mode: 'onSubmit',
+    defaultValues: extractDefaultValues(getStepSchema(schema, step)),
   })
 
   // ---------------------------------------------------------------------------
