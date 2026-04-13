@@ -1,5 +1,16 @@
 # @safeform/core
 
+## 4.1.0
+
+### Minor Changes
+
+- 2be0374: feat(core): expose isPending on SafeFormContext for use inside the Provider
+
+### Patch Changes
+
+- aa9abd3: fix(changesets): stop minor releases from cascading to major
+- 8040057: docs: add FormField integration example for useMask
+
 ## 4.0.0
 
 ### Minor Changes

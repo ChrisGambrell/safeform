@@ -1,5 +1,11 @@
 # @safeform/next
 
+## 4.1.0
+
+### Patch Changes
+
+- aa9abd3: fix(changesets): stop minor releases from cascading to major
+
 ## 4.0.0
 
 ### Patch Changes

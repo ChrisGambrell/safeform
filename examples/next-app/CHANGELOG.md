@@ -1,5 +1,16 @@
 # safeform-example-next
 
+## 0.2.3
+
+### Patch Changes
+
+- aa9abd3: fix(changesets): stop minor releases from cascading to major
+- Updated dependencies [aa9abd3]
+- Updated dependencies [2be0374]
+- Updated dependencies [8040057]
+  - @safeform/core@4.1.0
+  - @safeform/next@4.1.0
+
 ## 0.2.2
 
 ### Patch Changes
