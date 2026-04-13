@@ -10,6 +10,23 @@ npm install @safeform/core @safeform/next
 
 ---
 
+## Table of Contents
+
+- [Why safeform?](#why-safeform)
+- [Quick Start](#quick-start)
+- [Multi-Step Forms](#multi-step-forms)
+- [Arrays and Nested Objects](#arrays-and-nested-objects)
+- [Bringing Your Own UI](#bringing-your-own-ui)
+- [Masked Inputs](#masked-inputs)
+- [Middleware Stacking](#middleware-stacking)
+- [State Reference](#state-reference)
+- [Framework Adapters](#framework-adapters)
+- [Security](#security)
+- [Validation](#validation)
+- [License](#license)
+
+---
+
 ## Why safeform?
 
 Most form libraries stop at the client. You get typed fields and validation, but the moment you `fetch` your API route, you're on your own. You cast the response, hope the field error keys match your schema, and write the same boilerplate for every form.
@@ -399,6 +416,90 @@ export function EmployeeForm() {
     </SafeFormContext.Provider>
   )
 }
+```
+
+---
+
+## Masked Inputs
+
+`MaskedField` is a headless masked input component that auto-inserts literals as the user types, handles backspace correctly, and manages cursor position.
+
+### Tokens
+
+| Token | Matches |
+|-------|---------|
+| `#` | Digit (0–9) |
+| `$` | Letter (a–z, A–Z) |
+| `*` | Any non-whitespace |
+
+Everything else in the pattern is a **literal** — auto-inserted and never typed by the user.
+
+### Built-in masks
+
+| Name | Pattern |
+|------|---------|
+| `phone` | `(###) ###-####` |
+| `ssn` | `###-##-####` |
+| `date` | `##/##/####` |
+| `dateTime` | `##/##/#### ##:##` |
+| `time` | `##:##` |
+| `creditCard` | `#### #### #### ####` |
+| `cvv` | `###` |
+| `cvv4` | `####` |
+| `ein` | `##-#######` |
+| `postalCode` | `#####` |
+| `postalCodeFull` | `#####-####` |
+
+### Basic usage
+
+```tsx
+import { MaskedField } from '@safeform/core'
+
+<MaskedField name="phone" mask="phone">
+  {({ value, onChange, onKeyDown, onBlur, placeholder, maxLength, errors }) => (
+    <div>
+      <label>Phone</label>
+      <input
+        value={value}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        onBlur={onBlur}
+        placeholder={placeholder}  // "(___) ___-____"
+        maxLength={maxLength}
+      />
+      {errors.map(e => <p key={e}>{e}</p>)}
+    </div>
+  )}
+</MaskedField>
+```
+
+### Custom pattern
+
+```tsx
+<MaskedField name="license" mask="$$-###-$$$$">
+  {(props) => <input {...props} />}
+</MaskedField>
+```
+
+### Zod validation
+
+Use `MASK_SCHEMAS` for one-liner validation that matches the mask exactly, or `maskToZod` when you need a custom error message or a custom pattern.
+
+```ts
+import { MASK_SCHEMAS, maskToZod } from '@safeform/core'
+
+const schema = z.object({
+  // Pre-built schema with default error message
+  phone: MASK_SCHEMAS.phone,
+  dob:   MASK_SCHEMAS.date,
+  ssn:   MASK_SCHEMAS.ssn,
+
+  // Custom error message
+  mobile: maskToZod('phone', 'Enter a valid mobile number'),
+
+  // Custom pattern
+  pin: maskToZod('####', 'PIN must be 4 digits'),
+})
 ```
 
 ---

@@ -10,6 +10,17 @@ npm install @safeform/core @safeform/next
 
 ---
 
+## Table of Contents
+
+- [Usage](#usage)
+- [Request Format](#request-format)
+- [Response Format](#response-format)
+- [Multi-Step Forms](#multi-step-forms)
+- [Full Example](#full-example)
+- [License](#license)
+
+---
+
 ## Usage
 
 Mount a safeform action as a Next.js App Router route handler with a single line:
@@ -38,7 +49,7 @@ The route handler takes care of:
 
 ---
 
-## Request format
+## Request Format
 
 The client (`useForm` from `@safeform/core`) posts JSON in this shape:
 
@@ -50,7 +61,7 @@ The client (`useForm` from `@safeform/core`) posts JSON in this shape:
 
 ---
 
-## Response format
+## Response Format
 
 All responses are JSON:
 
@@ -70,13 +81,13 @@ All responses are JSON:
 
 ---
 
-## Multi-step forms
+## Multi-Step Forms
 
 `createRouteHandler` handles both unnamed (tuple) and named (`createSteps`) multi-step schemas automatically. No extra configuration needed.
 
 ---
 
-## Full example
+## Full Example
 
 ```ts
 // app/api/employees/schema.ts
