@@ -1,5 +1,13 @@
 # safeform-example-next
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [3d5ce83]
+  - @safeform/core@3.0.1
+  - @safeform/next@3.0.1
+
 ## 0.2.0
 
 ### Minor Changes

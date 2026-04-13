@@ -1,5 +1,11 @@
 # @safeform/core
 
+## 3.0.1
+
+### Patch Changes
+
+- 3d5ce83: Added a Masked Inputs section to the core and monorepo READMEs covering `MaskedField`, built-in masks, custom patterns, and Zod validation with
+
 ## 3.0.0
 
 ### Minor Changes
