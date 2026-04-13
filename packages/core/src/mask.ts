@@ -187,3 +187,38 @@ export function maskToZod(
 export const MASK_SCHEMAS = Object.fromEntries(
   (Object.keys(MASKS) as BuiltInMask[]).map(key => [key, maskToZod(key)]),
 ) as Record<BuiltInMask, z.ZodString>
+
+/**
+ * Build a Zod schema that accepts either a raw or masked value, strips all
+ * literals, validates the slot characters, and **transforms the output to the
+ * raw slot chars only** (no formatting).
+ *
+ * Use this when your action receives `rawValue` from `useMask` so you get
+ * clean, unformatted data on the server.
+ *
+ * @example
+ * ssn:   rawMask('ssn')                        // "123456789" after parse
+ * phone: rawMask('phone', 'Invalid phone')     // "5551234567" after parse
+ * pin:   rawMask('####', 'PIN must be 4 digits')
+ */
+export function rawMask(
+  mask: BuiltInMask | (string & {}),
+  message?: string,
+) {
+  const pattern = resolveMask(mask)
+
+  // Build a regex that matches only the slot characters (no literals)
+  const slotRegexSource = [...pattern]
+    .filter(ch => ch in MASK_TOKENS)
+    .map(ch => MASK_TOKENS[ch]!.source)
+    .join('')
+
+  const msg =
+    message ??
+    (mask in MASKS ? MASK_MESSAGES[mask as BuiltInMask] : 'Enter a valid value')
+
+  return z
+    .string()
+    .transform(val => extractSlotChars(val, pattern))
+    .pipe(z.string().regex(new RegExp(`^${slotRegexSource}$`), msg))
+}

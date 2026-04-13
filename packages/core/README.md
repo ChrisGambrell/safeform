@@ -359,22 +359,28 @@ const maskProps = useMask('$$-###-$$$$')
 
 ### Zod validation
 
-Use `MASK_SCHEMAS` for one-liner validation that matches the mask exactly, or `maskToZod` when you need a custom error message or a custom pattern.
+Three helpers cover every case:
+
+| Helper | Validates | Output after parse |
+|--------|-----------|--------------------|
+| `MASK_SCHEMAS.phone` | fully masked string `(555) 123-4567` | same string |
+| `maskToZod('phone', msg?)` | fully masked string | same string |
+| `rawMask('phone', msg?)` | raw or masked — strips literals | slot chars only `5551234567` |
+
+Use `rawMask` when your action receives `rawValue` from `useMask` — it strips any accidental formatting and validates the clean digits/letters.
 
 ```ts
-import { MASK_SCHEMAS, maskToZod } from '@safeform/core'
+import { MASK_SCHEMAS, maskToZod, rawMask } from '@safeform/core'
 
 const schema = z.object({
-  // Pre-built schema with default error message
-  phone: MASK_SCHEMAS.phone,
-  dob:   MASK_SCHEMAS.date,
-  ssn:   MASK_SCHEMAS.ssn,
+  // Validate a masked display value as-is
+  phone: MASK_SCHEMAS.phone,           // must be "(###) ###-####"
+  dob:   maskToZod('date', 'Bad date'), // custom message
 
-  // Custom error message
-  mobile: maskToZod('phone', 'Enter a valid mobile number'),
-
-  // Custom pattern
-  pin: maskToZod('####', 'PIN must be 4 digits'),
+  // Validate rawValue from useMask — transforms to clean slot chars
+  ssn:   rawMask('ssn'),               // "123456789" after parse
+  zip:   rawMask('postalCode', 'Invalid ZIP'),
+  pin:   rawMask('####', 'PIN must be 4 digits'),
 })
 ```
 
