@@ -1,5 +1,13 @@
 # @safeform/next
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [0618f20]
+- Updated dependencies [2e90b25]
+  - @safeform/core@3.0.0
+
 ## 2.0.0
 
 ### Patch Changes

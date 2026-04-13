@@ -1,5 +1,19 @@
 # safeform-example-next
 
+## 0.2.0
+
+### Minor Changes
+
+- 0618f20: Added `maskToZod(mask, message?)` to generate a Zod schema from any mask name or custom pattern, and `MASK_SCHEMAS` — a pre-built map of Zod
+
+### Patch Changes
+
+- 2d0d401: Added `MaskedField` examples to the patient intake form: date of birth using the built-in `date` mask and phone number using the built-in
+- Updated dependencies [0618f20]
+- Updated dependencies [2e90b25]
+  - @safeform/core@3.0.0
+  - @safeform/next@3.0.0
+
 ## 0.1.2
 
 ### Patch Changes
