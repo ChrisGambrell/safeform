@@ -11,8 +11,10 @@ import {
 } from './mask.js'
 
 export interface UseMaskReturn {
-  /** The current masked display value */
+  /** The formatted display value — spread onto the input's `value` prop */
   value: string
+  /** The raw slot characters only, with no literals — use this for form submission / actions */
+  rawValue: string
   /** Pass directly to <input onChange={...}> */
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   /** Pass directly to <input onKeyDown={...}> — handles backspace correctly */
@@ -44,15 +46,17 @@ export interface UseMaskReturn {
  */
 export function useMask(mask: BuiltInMask | (string & {})): UseMaskReturn {
   const resolvedMask = resolveMask(mask)
-  const [value, setValue] = useState('')
+
+  // Store only the raw slot chars — derive the display value from them
+  const [slotChars, setSlotChars] = useState('')
+  const value = applyMask(slotChars, resolvedMask)
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const slotChars = extractSlotChars(e.target.value, resolvedMask)
-      const masked = applyMask(slotChars, resolvedMask)
-      setValue(masked)
+      const newSlotChars = extractSlotChars(e.target.value, resolvedMask)
+      setSlotChars(newSlotChars)
 
-      const newCursor = maskedCursorPos(slotChars.length, resolvedMask)
+      const newCursor = maskedCursorPos(newSlotChars.length, resolvedMask)
       requestAnimationFrame(() => {
         e.target.setSelectionRange(newCursor, newCursor)
       })
@@ -81,24 +85,23 @@ export function useMask(mask: BuiltInMask | (string & {})): UseMaskReturn {
         return
       }
 
-      const slotChars = extractSlotChars(value, resolvedMask)
       const newSlotChars =
         slotChars.slice(0, slotsBeforeCursor - 1) + slotChars.slice(slotsBeforeCursor)
-      const newMasked = applyMask(newSlotChars, resolvedMask)
 
       e.preventDefault()
-      setValue(newMasked)
+      setSlotChars(newSlotChars)
 
       const newCursor = maskedCursorPos(slotsBeforeCursor - 1, resolvedMask)
       requestAnimationFrame(() => {
         input.setSelectionRange(newCursor, newCursor)
       })
     },
-    [resolvedMask, value],
+    [resolvedMask, slotChars, value],
   )
 
   return {
     value,
+    rawValue: slotChars,
     onChange,
     onKeyDown,
     placeholder: maskPlaceholder(resolvedMask),

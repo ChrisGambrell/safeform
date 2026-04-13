@@ -455,12 +455,19 @@ Everything else in the pattern is a **literal** — auto-inserted and never type
 ```tsx
 import { useMask } from '@safeform/core'
 
-const maskProps = useMask('phone')
+const { rawValue, ...maskProps } = useMask('phone')
 
 <input {...maskProps} />
 ```
 
-`maskProps` includes `value`, `onChange`, `onKeyDown`, `placeholder`, and `maxLength` — spread it and you're done.
+`maskProps` includes `value` (formatted display), `onChange`, `onKeyDown`, `placeholder`, and `maxLength` — spread it onto the input. Use `rawValue` when you need just the digits/letters with no literals (e.g. to pass to an action).
+
+```tsx
+// Phone: value = "(555) 123-4567", rawValue = "5551234567"
+// SSN:   value = "123-45-6789",    rawValue = "123456789"
+// Date:  value = "01/15/1990",     rawValue = "01151990"
+await myAction({ phone: rawValue })
+```
 
 ### With any UI library
 
