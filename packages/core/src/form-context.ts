@@ -10,6 +10,8 @@ export interface SafeFormContextValue {
   fieldErrors: Record<string, string[]>
   /** Current step index (0-based). Always 0 for single-step forms. */
   currentStep: number
+  /** True while the form submission is in-flight */
+  isPending: boolean
 }
 
 /**

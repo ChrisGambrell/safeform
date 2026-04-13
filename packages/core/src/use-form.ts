@@ -317,6 +317,7 @@ export function useForm<
     rhf: rhf as SafeFormContextValue['rhf'],
     fieldErrors: state.fieldErrors,
     currentStep: step,
+    isPending: state.isPending,
   }
 
   return {
