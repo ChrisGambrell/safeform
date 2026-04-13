@@ -1,6 +1,6 @@
 {
   "name": "@safeform/next",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Next.js App Router adapter for safeform",
   "license": "MIT",
   "type": "module",
