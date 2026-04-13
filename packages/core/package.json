@@ -1,6 +1,6 @@
 {
   "name": "@safeform/core",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "End-to-end type-safe forms for React",
   "license": "MIT",
   "type": "module",

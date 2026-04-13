@@ -1,5 +1,16 @@
 # safeform-example-next
 
+## 0.2.2
+
+### Patch Changes
+
+- 2b68480: docs: update masked input docs to reflect useMask hook
+- Updated dependencies [21dd629]
+- Updated dependencies [2b68480]
+- Updated dependencies [1dc93eb]
+  - @safeform/core@4.0.0
+  - @safeform/next@4.0.0
+
 ## 0.2.1
 
 ### Patch Changes

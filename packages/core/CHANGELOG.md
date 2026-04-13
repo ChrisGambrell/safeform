@@ -1,5 +1,16 @@
 # @safeform/core
 
+## 4.0.0
+
+### Minor Changes
+
+- 21dd629: feat(core): add rawMask() Zod helper for slot-char validation and transformation
+- 1dc93eb: feat(core): expose rawValue from useMask for unformatted submission
+
+### Patch Changes
+
+- 2b68480: docs: update masked input docs to reflect useMask hook
+
 ## 3.0.1
 
 ### Patch Changes
