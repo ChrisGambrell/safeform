@@ -1,6 +1,6 @@
 export { createAction } from './action.js'
 export { useForm } from './use-form.js'
-export { SafeFormContext, useSafeFormContext } from './form-context.js'
+export { SafeFormContext, useSafeFormContext, useIsPending } from './form-context.js'
 export { FormField } from './form-field.js'
 export { FormArray } from './form-array.js'
 export { useMask } from './use-mask.js'

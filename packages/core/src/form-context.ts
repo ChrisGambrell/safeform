@@ -41,3 +41,12 @@ export function useSafeFormContext(): SafeFormContextValue {
   }
   return ctx
 }
+
+/**
+ * Returns `isPending` from the nearest `SafeFormContext.Provider`, or `false`
+ * if called outside one. Safe to use in button components that may live inside
+ * or outside a form Provider.
+ */
+export function useIsPending(): boolean {
+  return useContext(SafeFormContext)?.isPending ?? false
+}
