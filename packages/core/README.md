@@ -290,7 +290,7 @@ const { _ctx, formProps, state } = useForm<UpsertEmployeeAction>({ ... })
 
 ## Masked Inputs
 
-`MaskedField` is a headless masked input component that auto-inserts literals as the user types, handles backspace correctly, and manages cursor position.
+`useMask` is a standalone hook that manages mask state and returns props you can spread onto any input — native, shadcn, Radix, or otherwise. No form context required.
 
 ### Tokens
 
@@ -321,32 +321,33 @@ Everything else in the pattern is a **literal** — auto-inserted and never type
 ### Basic usage
 
 ```tsx
-import { MaskedField } from '@safeform/core'
+import { useMask } from '@safeform/core'
 
-<MaskedField name="phone" mask="phone">
-  {({ value, onChange, onKeyDown, onBlur, placeholder, maxLength, errors }) => (
-    <div>
-      <label>Phone</label>
-      <input
-        value={value}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        onBlur={onBlur}
-        placeholder={placeholder}  // "(___) ___-____"
-        maxLength={maxLength}
-      />
-      {errors.map(e => <p key={e}>{e}</p>)}
-    </div>
-  )}
-</MaskedField>
+const maskProps = useMask('phone')
+
+<input {...maskProps} />
+```
+
+`maskProps` includes `value`, `onChange`, `onKeyDown`, `placeholder`, and `maxLength` — spread it and you're done.
+
+### With any UI library
+
+```tsx
+// shadcn
+import { Input } from '@/components/ui/input'
+const maskProps = useMask('date')
+<Input {...maskProps} />
+
+// Radix or anything else
+const maskProps = useMask('ssn')
+<MyCustomInput {...maskProps} />
 ```
 
 ### Custom pattern
 
 ```tsx
-<MaskedField name="license" mask="$$-###-$$$$">
-  {(props) => <input {...props} />}
-</MaskedField>
+const maskProps = useMask('$$-###-$$$$')
+<input {...maskProps} />
 ```
 
 ### Zod validation

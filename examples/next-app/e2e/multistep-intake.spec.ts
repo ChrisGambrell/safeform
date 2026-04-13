@@ -10,8 +10,6 @@ test.describe('Patient intake — named multi-step (E-10)', () => {
     // Step 1 — personal
     await expect(page.getByTestId('step-indicator')).toContainText('Step 1 of 2')
     await page.getByTestId('firstName-input').fill('Jane')
-    await page.getByTestId('dob-input').fill('01/15/1990')
-    await page.getByTestId('phone-input').fill('(555) 123-4567')
     await page.getByTestId('next-btn').click()
 
     // Step 2 — vitals
@@ -24,7 +22,7 @@ test.describe('Patient intake — named multi-step (E-10)', () => {
   })
 
   test('next() blocks on invalid step 1', async ({ page }) => {
-    // Don't fill any fields, try to advance
+    // Don't fill firstName, try to advance
     await page.getByTestId('next-btn').click()
     await expect(page.getByTestId('step-indicator')).toContainText('Step 1 of 2')
     await expect(page.getByTestId('firstName-error')).toBeVisible()
@@ -32,8 +30,6 @@ test.describe('Patient intake — named multi-step (E-10)', () => {
 
   test('prev() returns to step 1 from step 2', async ({ page }) => {
     await page.getByTestId('firstName-input').fill('Jane')
-    await page.getByTestId('dob-input').fill('01/15/1990')
-    await page.getByTestId('phone-input').fill('(555) 123-4567')
     await page.getByTestId('next-btn').click()
     await expect(page.getByTestId('step-indicator')).toContainText('Step 2 of 2')
 
