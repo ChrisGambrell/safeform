@@ -489,6 +489,82 @@ const maskProps = useMask('$$-###-$$$$')
 <input {...maskProps} />
 ```
 
+### Using with FormField
+
+Call `useMask` at the component level, then sync `rawValue` into the form with `useEffect`. The input gets the mask's display props; `FormField` provides errors and handles validation.
+
+```tsx
+'use client'
+import { useEffect } from 'react'
+import { useForm, SafeFormContext, FormField, useMask } from '@safeform/core'
+import type { ContactAction } from '@/app/api/contact/route'
+import { contactSchema } from '@/app/api/contact/schema'
+
+export function ContactForm() {
+  const form = useForm<ContactAction>({ endpoint: '/api/contact', schema: contactSchema })
+
+  // One useMask call per masked field — at the component level
+  const phoneMask = useMask('phone')
+  const dobMask   = useMask('date')
+
+  // Sync rawValue → form state whenever the mask value changes
+  useEffect(() => { form._ctx.rhf.setValue('phone', phoneMask.rawValue) }, [phoneMask.rawValue])
+  useEffect(() => { form._ctx.rhf.setValue('dob',   dobMask.rawValue)   }, [dobMask.rawValue])
+
+  return (
+    <SafeFormContext.Provider value={form._ctx}>
+      <form {...form.formProps}>
+
+        <FormField name="phone">
+          {({ errors }) => (
+            <div>
+              <label>Phone</label>
+              <input
+                value={phoneMask.value}
+                onChange={phoneMask.onChange}
+                onKeyDown={phoneMask.onKeyDown}
+                placeholder={phoneMask.placeholder}
+                maxLength={phoneMask.maxLength}
+              />
+              {errors?.map(e => <p key={e}>{e}</p>)}
+            </div>
+          )}
+        </FormField>
+
+        <FormField name="dob">
+          {({ errors }) => (
+            <div>
+              <label>Date of Birth</label>
+              <input
+                value={dobMask.value}
+                onChange={dobMask.onChange}
+                onKeyDown={dobMask.onKeyDown}
+                placeholder={dobMask.placeholder}
+                maxLength={dobMask.maxLength}
+              />
+              {errors?.map(e => <p key={e}>{e}</p>)}
+            </div>
+          )}
+        </FormField>
+
+        <button type="submit" disabled={form.state.isPending}>Submit</button>
+      </form>
+    </SafeFormContext.Provider>
+  )
+}
+```
+
+The schema on the server should use `rawMask` so it validates the clean digits and transforms the value — no formatting characters reach your handler:
+
+```ts
+import { rawMask } from '@safeform/core'
+
+const contactSchema = z.object({
+  phone: rawMask('phone'),  // validates 10 digits, output: "5551234567"
+  dob:   rawMask('date'),   // validates 8 digits, output: "01151990"
+})
+```
+
 ### Zod validation
 
 Three helpers cover every case:
