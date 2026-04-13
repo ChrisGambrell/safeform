@@ -1,5 +1,12 @@
 # @safeform/core
 
+## 3.0.0
+
+### Minor Changes
+
+- 0618f20: Added `maskToZod(mask, message?)` to generate a Zod schema from any mask name or custom pattern, and `MASK_SCHEMAS` — a pre-built map of Zod
+- 2e90b25: Added `MaskedField`, a render-prop component for masked text inputs. Supports
+
 ## 2.0.0
 
 ### Minor Changes
