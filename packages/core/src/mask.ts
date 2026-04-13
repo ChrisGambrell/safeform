@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 // ---------------------------------------------------------------------------
 // Mask token definitions
 //   #  →  digit        (0–9)
@@ -124,3 +126,64 @@ export function maskedCursorPos(numSlots: number, mask: string): number {
 export function maskPlaceholder(mask: string): string {
   return [...mask].map(ch => (ch in MASK_TOKENS ? '_' : ch)).join('')
 }
+
+// ---------------------------------------------------------------------------
+// Zod schema helpers
+// ---------------------------------------------------------------------------
+
+const MASK_MESSAGES: Record<BuiltInMask, string> = {
+  creditCard:     'Enter a valid credit card number',
+  cvv:            'Enter a valid CVV',
+  cvv4:           'Enter a valid CVV',
+  date:           'Enter a valid date (MM/DD/YYYY)',
+  dateTime:       'Enter a valid date and time (MM/DD/YYYY HH:MM)',
+  ein:            'Enter a valid EIN (##-#######)',
+  phone:          'Enter a valid phone number',
+  postalCode:     'Enter a valid postal code',
+  postalCodeFull: 'Enter a valid ZIP+4 postal code',
+  ssn:            'Enter a valid SSN',
+  time:           'Enter a valid time (HH:MM)',
+}
+
+/**
+ * Build a Zod string schema that validates a fully-filled masked value.
+ * Works with built-in mask names or custom pattern strings.
+ *
+ * @example
+ * maskToZod('phone')                    // built-in with default message
+ * maskToZod('phone', 'Phone required')  // custom message
+ * maskToZod('#####-####', 'Bad ZIP')    // custom pattern
+ */
+export function maskToZod(
+  mask: BuiltInMask | (string & {}),
+  message?: string,
+): z.ZodString {
+  const pattern = resolveMask(mask)
+
+  // Escape special regex chars in literals; expand tokens to their regex source
+  const regexSource = [...pattern]
+    .map(ch => {
+      if (ch in MASK_TOKENS) return MASK_TOKENS[ch]!.source
+      return ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    })
+    .join('')
+
+  const msg =
+    message ??
+    (mask in MASKS ? MASK_MESSAGES[mask as BuiltInMask] : `Enter a valid value`)
+
+  return z.string().regex(new RegExp(`^${regexSource}$`), msg)
+}
+
+/**
+ * Pre-built Zod schemas for every built-in mask, using default error messages.
+ * Use `maskToZod` directly if you need a custom message.
+ *
+ * @example
+ * dob:   MASK_SCHEMAS.date
+ * phone: MASK_SCHEMAS.phone
+ * ssn:   MASK_SCHEMAS.ssn
+ */
+export const MASK_SCHEMAS = Object.fromEntries(
+  (Object.keys(MASKS) as BuiltInMask[]).map(key => [key, maskToZod(key)]),
+) as Record<BuiltInMask, z.ZodString>
