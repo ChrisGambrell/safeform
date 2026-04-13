@@ -1,5 +1,11 @@
 # @safeform/core
 
+## 4.2.0
+
+### Minor Changes
+
+- ee2e606: feat(core): add useIsPending hook — safe outside Provider, returns false
+
 ## 4.1.0
 
 ### Minor Changes
